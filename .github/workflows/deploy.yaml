@@ -4,8 +4,8 @@ on:
   workflow_dispatch:
 
 permissions:
-      id-token: write
-      contents: read
+  id-token: write
+  contents: read
 
 jobs:
   reusable_workflow_job:
@@ -13,8 +13,8 @@ jobs:
     with:
       templateVersion: 0.9.10
       rg: rg-poshcode
-      resourceName: aks-poshcode
-      templateParams: resourceName=aks-poshcode agentCount=0 upgradeChannel=stable agentCountMax=3 custom_vnet=true vnetAksSubnetAddressPrefix=10.240.0.0/24 bastion=true enable_aad=true AksDisableLocalAccounts=true enableAzureRBAC=true adminPrincipalId=_USER_OBJECT_ID_ networkPolicy=calico openServiceMeshAddon=true azurepolicy=audit authorizedIPRanges=["98.10.203.122"] maxPods=40 keyVaultKmsCreate=true keyVaultKmsOfficerRolePrincipalId=_USER_OBJECT_ID_ fluxGitOpsAddon=true createNatGateway=true aksOutboundTrafficType=userAssignedNATGateway natGwIdleTimeout=20 kedaAddon=true blobCSIDriver=true oidcIssuer=true workloadIdentity=true networkPluginMode=Overlay
+      resourceName: poshcode
+      templateParams: resourceName=poshcode agentCount=0 upgradeChannel=stable agentCountMax=3 custom_vnet=true vnetAksSubnetAddressPrefix=10.240.0.0/24 bastion=true enable_aad=true AksDisableLocalAccounts=true enableAzureRBAC=true adminPrincipalId=_USER_OBJECT_ID_ networkPolicy=calico openServiceMeshAddon=true azurepolicy=audit authorizedIPRanges=["98.10.203.122"] maxPods=40 keyVaultKmsCreate=true keyVaultKmsOfficerRolePrincipalId=_USER_OBJECT_ID_ fluxGitOpsAddon=true createNatGateway=true aksOutboundTrafficType=userAssignedNATGateway natGwIdleTimeout=20 kedaAddon=true blobCSIDriver=true oidcIssuer=true workloadIdentity=true networkPluginMode=Overlay
       postScriptParams: "ingress=contour,monitor=oss"
     secrets:
       AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
