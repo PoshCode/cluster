@@ -33,6 +33,7 @@ jobs:
 
       - uses: azure/arm-deploy@v1
         name: ARM deploy
+        timeout-minutes: 240
         with:
           template: infrastructure/Cluster.json
           subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION }}
