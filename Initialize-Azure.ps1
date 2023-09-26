@@ -57,6 +57,7 @@ $ctx = Get-AzContext
 gh secret set --repo https://github.com/$repo AZURE_CLIENT_ID -b $app.AppId
 gh secret set --repo https://github.com/$repo AZURE_TENANT_ID -b $ctx.Tenant
 gh secret set --repo https://github.com/$repo AZURE_SUBSCRIPTION_ID -b $ctx.Subscription.Id
+gh secret set --repo https://github.com/$repo AZURE_RG -b $resourceGroupName
 # gh secret set --repo https://github.com/$repo USER_OBJECT_ID -b $spId
 
 # This stuff doesn't HAVE to be done...
