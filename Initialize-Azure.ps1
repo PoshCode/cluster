@@ -26,10 +26,14 @@ param(
 
 # Register a bunch of preview features
 # "CiliumDataplanePreview" is not working as far as I can tell
-foreach ($feature in "AKS-KedaPreview", "AKSNetworkModePreview", "AzureOverlayPreview", "EnableBlobCSIDriver", "EnableNetworkPolicy", "EnableOIDCIssuerPreview", "EnableWorkloadIdentityPreview") {
-    # "createNatGateway", "aksOutboundTrafficType", "natGwIdleTimeout"
-    # az feature register --name $feature --namespace Microsoft.ContainerService
-    Register-AzProviderFeature -FeatureName $feature -ProviderNamespace Microsoft.ContainerService
+Get-AzProviderFeature -ProviderNamespace Microsoft.ContainerService -OutVariable enabledFeatures
+foreach ($feature in "AKS-KedaPreview", "AKSNetworkModePreview", "AzureOverlayPreview",
+                    "EnableBlobCSIDriver", "EnableNetworkPolicy", "EnableOIDCIssuerPreview",
+                    "EnableWorkloadIdentityPreview", "NodeOSUpgradeChannelPreview",
+                    "IPBasedLoadBalancerPreview") {
+    if ($enabledFeatures.Name -notcontains $feature ) {
+        Register-AzProviderFeature -FeatureName $feature -ProviderNamespace Microsoft.ContainerService
+    }
 }
 
 # Create resource group
@@ -54,3 +58,9 @@ gh secret set --repo https://github.com/$repo AZURE_CLIENT_ID -b $app.AppId
 gh secret set --repo https://github.com/$repo AZURE_TENANT_ID -b $ctx.Tenant
 gh secret set --repo https://github.com/$repo AZURE_SUBSCRIPTION_ID -b $ctx.Subscription.Id
 # gh secret set --repo https://github.com/$repo USER_OBJECT_ID -b $spId
+
+# This stuff doesn't HAVE to be done...
+$admins = (Get-AzADGroup -Filter "DisplayName eq 'AksAdmins'") ??
+            (New-AzADGroup -DisplayName AksAdmins -MailNickname AksAdmins -Description "Kubernetes Admins")
+
+gh secret set --repo https://github.com/$repo ADMIN_GROUP_ID -b $admins.Id

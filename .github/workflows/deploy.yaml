@@ -1,23 +1,52 @@
-name: Deploy AKS-Construction
+name: Deploy Kubernetes Cluster
 
-on:
-  workflow_dispatch:
+on: workflow_dispatch
 
 permissions:
   id-token: write
   contents: read
 
+# https://docs.github.com/en/actions/deployment/deploying-to-your-cloud-provider/deploying-to-azure/deploying-to-azure-kubernetes-service
+# https://docs.github.com/en/actions/publishing-packages/about-packaging-with-github-actions
+
 jobs:
-  reusable_workflow_job:
-    uses: Azure/AKS-Construction/.github/workflows/AKSC_Deploy.yml@0.9.10
-    with:
-      templateVersion: 0.9.10
-      rg: rg-poshcode
-      resourceName: poshcode
-      templateParams: resourceName=poshcode agentCount=0 upgradeChannel=stable agentCountMax=3 custom_vnet=true vnetAksSubnetAddressPrefix=10.240.0.0/24 bastion=true enable_aad=true AksDisableLocalAccounts=true enableAzureRBAC=true adminPrincipalId=_USER_OBJECT_ID_ networkPolicy=calico openServiceMeshAddon=true azurepolicy=audit authorizedIPRanges=["98.10.203.122"] maxPods=40 keyVaultKmsCreate=true keyVaultKmsOfficerRolePrincipalId=_USER_OBJECT_ID_ fluxGitOpsAddon=true createNatGateway=true aksOutboundTrafficType=userAssignedNATGateway natGwIdleTimeout=20 kedaAddon=true blobCSIDriver=true oidcIssuer=true workloadIdentity=true networkPluginMode=Overlay
-      postScriptParams: "ingress=contour,monitor=oss"
-    secrets:
-      AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-      AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-      AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      USER_OBJECT_ID: ${{ secrets.USER_OBJECT_ID }}
+  deploy-bicep:
+    runs-on: ubuntu-latest
+    name: Deploy Bicep
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: azure/login@v1
+        name: Login to Azure
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          enable-AzPSSession: true
+
+      # Why on earth can't I just deploy the bicep file?
+      - uses: azure/bicep-build-action@v1.0.0
+        name: Bicep Build
+        with:
+          bicepFilePath: infrastructure/Cluster.bicep
+          outputFilePath: infrastructure/Cluster.json
+
+      - uses: azure/arm-deploy@v1
+        name: ARM deploy
+        with:
+          template: infrastructure/Cluster.json
+          subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION }}
+          resourceGroupName: ${{ secrets.AZURE_RG }}
+          parameters: adminId=${{ secrets.ADMIN_GROUP_ID }}
+
+    # with:
+    #   templateVersion: 0.9.10
+    #   rg: rg-poshcode
+    #   resourceName: poshcode
+    #   templateParams: resourceName=poshcode agentCount=0 upgradeChannel=stable agentCountMax=3 custom_vnet=true vnetAksSubnetAddressPrefix=10.240.0.0/24 bastion=true enable_aad=true AksDisableLocalAccounts=true enableAzureRBAC=true adminPrincipalId=_USER_OBJECT_ID_ networkPolicy=calico openServiceMeshAddon=true azurepolicy=audit authorizedIPRanges=["98.10.203.122"] maxPods=40 keyVaultKmsCreate=true keyVaultKmsOfficerRolePrincipalId=_USER_OBJECT_ID_ fluxGitOpsAddon=true createNatGateway=true aksOutboundTrafficType=userAssignedNATGateway natGwIdleTimeout=20 kedaAddon=true blobCSIDriver=true oidcIssuer=true workloadIdentity=true networkPluginMode=Overlay
+    #   postScriptParams: "ingress=contour,monitor=oss"
+    # secrets:
+    #   AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+    #   AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+    #   AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+    #   USER_OBJECT_ID: ${{ secrets.USER_OBJECT_ID }}
