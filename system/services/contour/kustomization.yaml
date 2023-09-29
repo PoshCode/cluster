@@ -1,0 +1,12 @@
+resources:
+  - namespace.yaml
+  - helm-release.yaml
+
+configMapGenerator:
+  - name: contour-values
+    namespace: flux-system
+    files:
+      - values.yaml=contour-13.1.0-values.yaml
+
+configurations:
+  - valuesfrom.yaml

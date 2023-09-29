@@ -1,7 +1,0 @@
-resources:
-  - cert-manager.yaml
-  - contour.yaml
-
-labels:
-  - pairs:
-      toolkit.fluxcd.io/tenant: sre-team

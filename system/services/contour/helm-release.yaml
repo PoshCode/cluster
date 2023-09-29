@@ -1,0 +1,30 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: contour
+  namespace: flux-system
+spec:
+  interval: 30m
+  timeout: 5m
+  releaseName: contour
+  targetNamespace: contour
+  chart:
+    spec:
+      chart: contour
+      version: "13.1.x"
+      sourceRef:
+        kind: HelmRepository
+        name: bitnami
+        namespace: flux-system
+      interval: 12h
+  install:
+    remediation:
+      retries: 2
+  upgrade:
+    remediation:
+      retries: 5
+  rollback:
+    timeout: 5m
+  valuesFrom:
+  - kind: ConfigMap
+    name: contour-values
