@@ -31,6 +31,10 @@ jobs:
           bicepFilePath: infrastructure/Cluster.bicep
           outputFilePath: infrastructure/Cluster.json
 
+      - id: name
+        shell: pwsh
+        run: '"name=aks-$(Get-Date -f yyyyMMddThhmmss)" >> $Env:GITHUB_OUTPUT'
+
       - uses: azure/arm-deploy@v1
         name: ARM deploy
         timeout-minutes: 240
@@ -39,6 +43,7 @@ jobs:
           subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION }}
           resourceGroupName: ${{ secrets.AZURE_RG }}
           parameters: adminId=${{ secrets.ADMIN_GROUP_ID }}
+          deploymentName: ${{ steps.name.outputs.name }}
 
     # with:
     #   templateVersion: 0.9.10
