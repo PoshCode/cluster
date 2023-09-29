@@ -28,13 +28,20 @@ param(
 # "CiliumDataplanePreview" is not working as far as I can tell
 Get-AzProviderFeature -ProviderNamespace Microsoft.ContainerService -OutVariable enabledFeatures
 foreach ($feature in "AKS-KedaPreview", "AKSNetworkModePreview", "AzureOverlayPreview",
-                    "EnableBlobCSIDriver", "EnableNetworkPolicy", "EnableOIDCIssuerPreview",
-                    "EnableWorkloadIdentityPreview", "NodeOSUpgradeChannelPreview",
-                    "IPBasedLoadBalancerPreview") {
+    "EnableBlobCSIDriver", "EnableNetworkPolicy", "EnableWorkloadIdentityPreview",
+    "NodeOSUpgradeChannelPreview", "IPBasedLoadBalancerPreview") {
     if ($enabledFeatures.Name -notcontains $feature ) {
         Register-AzProviderFeature -FeatureName $feature -ProviderNamespace Microsoft.ContainerService
     }
 }
+
+Get-AzProviderFeature -ProviderNamespace Microsoft.KubernetesConfiguration -OutVariable enabledFeatures
+foreach ($feature in "FluxConfigurations") {
+    if ($enabledFeatures.Name -notcontains $feature ) {
+        Register-AzProviderFeature -FeatureName $feature -ProviderNamespace Microsoft.ContainerService
+    }
+}
+
 
 # Create resource group
 New-AzResourceGroup -Name $resourceGroupName -Location $location -Force -Tag @{
@@ -53,6 +60,7 @@ $fedcred  = (Get-AzADAppFederatedCredential -ApplicationObjectId $app.id) ??
             (New-AzADAppFederatedCredential -ApplicationObjectId $app.Id -Audience "api://AzureADTokenExchange" -Issuer "https://token.actions.githubusercontent.com" -Subject "repo:${repo}:ref:refs/heads/main" -Name "$serviceName-main-gh")
 
 $ctx = Get-AzContext
+
 # Set Secrets for the $repo workflows
 gh secret set --repo https://github.com/$repo AZURE_CLIENT_ID -b $app.AppId
 gh secret set --repo https://github.com/$repo AZURE_TENANT_ID -b $ctx.Tenant
