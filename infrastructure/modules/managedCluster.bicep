@@ -195,13 +195,13 @@ param logAnalyticsWorkspaceResourceID string
 
 
 @description('A private AKS Kubernetes cluster')
-resource cluster 'Microsoft.ContainerService/managedClusters@2022-11-02-preview' = {
+resource cluster 'Microsoft.ContainerService/managedClusters@2023-05-02-preview' = {
   name: 'aks-${baseName}'
   location: location
   tags: tags
   identity: identity
   sku: {
-    name: 'Basic'
+    name: 'Base'
     tier: 'Free'
   }
   properties: {
@@ -209,7 +209,7 @@ resource cluster 'Microsoft.ContainerService/managedClusters@2022-11-02-preview'
     dnsPrefix: baseName
     // I really hate the default MC_ nonsense
     nodeResourceGroup: '${resourceGroup().name}-aks'
-    publicNetworkAccess: 'Disabled'
+    publicNetworkAccess: 'Enabled'
     autoUpgradeProfile: {
       nodeOSUpgradeChannel: clusterNodeOSUpgradeChannel
       upgradeChannel: controlPlaneUpgradeChannel
@@ -234,8 +234,9 @@ resource cluster 'Microsoft.ContainerService/managedClusters@2022-11-02-preview'
     }
     // AAD enabled, no local accounts allowed
     disableLocalAccounts: false
+
     addonProfiles: {
-      /* *** KeyVault CSI Provider ***
+      //* *** KeyVault CSI Provider ***
       azureKeyvaultSecretsProvider: {
         enabled: true
         config: {
@@ -243,21 +244,27 @@ resource cluster 'Microsoft.ContainerService/managedClusters@2022-11-02-preview'
           rotationPollInterval: '2m'
         }
       } // */
-      // *** Log Analytics ***
+
+      //* *** Log Analytics ***
       omsagent: {
         enabled: true
         config: {
           logAnalyticsWorkspaceResourceID: logAnalyticsWorkspaceResourceID
         }
       } // */
-      // *** OSM is an Envoy based service mesh interface ***
+
+      //* *** OSM is an Envoy based service mesh interface ***
       // https://learn.microsoft.com/en-us/azure/aks/open-service-mesh-about
       openServiceMesh: {
         enabled: true
         config: {}
       } // */
+
       azurepolicy: {
         enabled: true
+        config: {
+          version: 'v2'
+        }
       }
     }
     agentPoolProfiles: [ systemNodePool ]
@@ -266,8 +273,8 @@ resource cluster 'Microsoft.ContainerService/managedClusters@2022-11-02-preview'
 
     networkProfile: {
       networkPlugin: 'azure'
-      // ebpfDataplane: 'cilium'
-      networkPolicy: 'calico' // when using cilium, can't specify this
+      networkDataplane: 'cilium'
+      networkPolicy: 'cilium'
       networkPluginMode: 'overlay'
       outboundType: 'loadBalancer'
       // This is the cluster load balancer, not the outbound
@@ -276,12 +283,10 @@ resource cluster 'Microsoft.ContainerService/managedClusters@2022-11-02-preview'
       podCidr: podCidr
       ipFamilies: [ 'IPv4' ]
       dnsServiceIP: dnsServiceIP
-      dockerBridgeCidr: '172.17.0.1/16' // Supports running docker within the AKS cluster?
       loadBalancerProfile: {
         managedOutboundIPs: {
           count: 1
         }
-        backendPoolType: 'nodeIPConfiguration'
       }
     }
     // privateLinkResources: [
@@ -297,7 +302,6 @@ resource cluster 'Microsoft.ContainerService/managedClusters@2022-11-02-preview'
     // ]
     apiServerAccessProfile: {
       enablePrivateCluster: false
-      enableVnetIntegration: false
       // authorizedIPRanges: [
       //   '98.10.203.122'
       //   '2603:7080:9902:7e70:9498:1aa:9c67:4601'
@@ -320,7 +324,6 @@ resource cluster 'Microsoft.ContainerService/managedClusters@2022-11-02-preview'
     storageProfile: {
       diskCSIDriver: {
         enabled: true
-        version: 'v1'
       }
       fileCSIDriver: {
         enabled: true
@@ -337,42 +340,24 @@ resource cluster 'Microsoft.ContainerService/managedClusters@2022-11-02-preview'
       level: 'Warning'
       version: ''
     } //  */
-    // *** KEDA autoscaling is one of the core reasons to use k8s in the first place ***
     workloadAutoScalerProfile: {
+      // *** KEDA autoscaling is one of the core reasons to use k8s in the first place ***
       keda: {
         enabled: true
       }
-    } // */
-  }
-}
-
-@description('Diagnostic categories to log')
-param diagnosticCategories array = [
-  'cluster-autoscaler'
-  'kube-controller-manager'
-  'kube-audit-admin'
-  'guard'
-]
-
-resource AksDiags 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' =  if (logAnalyticsWorkspaceResourceID>'')  {
-  name: 'ds-${baseName}'
-  scope: cluster
-  properties: {
-    workspaceId: logAnalyticsWorkspaceResourceID
-    logs: [for aksDiagCategory in diagnosticCategories: {
-      category: aksDiagCategory
-      enabled: true
-    }]
-    metrics: [
-      {
-        category: 'AllMetrics'
-        enabled: true
+      // */
+      /* *** the VerticalPodAutoscaler helps adjust requests and limits
+      verticalPodAutoscaler: {
+        enabled: false
+        controlledValues: 'RequestsAndLimits'
+        updateMode: 'Auto'
       }
-    ]
+      // */
+    }
   }
 }
 
-resource agentPools 'Microsoft.ContainerService/managedClusters/agentPools@2022-11-02-preview' = [for (pool, index) in additionalNodePools: {
+resource agentPools 'Microsoft.ContainerService/managedClusters/agentPools@2023-07-01' = [for (pool, index) in additionalNodePools: {
   // The default is 6 characters long because that's the max for Windows nodes
   name: contains(pool, 'name') ? pool.name : format('npuser{0:D2}', index)
   parent: cluster
@@ -382,7 +367,7 @@ resource agentPools 'Microsoft.ContainerService/managedClusters/agentPools@2022-
     count: contains(pool, 'count') ? pool.count : 1
     // creationData: { sourceResourceId: 'string' }
     enableAutoScaling: contains(pool, 'enableAutoScaling') ? pool.enableAutoScaling : true
-    enableCustomCATrust: contains(pool, 'enableCustomCATrust') ? pool.enableCustomCATrust : false
+    // enableCustomCATrust: contains(pool, 'enableCustomCATrust') ? pool.enableCustomCATrust : false
     enableEncryptionAtHost: contains(pool, 'enableEncryptionAtHost') ? pool.enableEncryptionAtHost : false
     enableFIPS: contains(pool, 'enableFIPS') ? pool.enableFIPS : false
     enableNodePublicIP: contains(pool, 'enableNodePublicIP') ? pool.enableNodePublicIP : false
@@ -425,7 +410,7 @@ resource agentPools 'Microsoft.ContainerService/managedClusters/agentPools@2022-
 // Supposedly, the extension will be installed automatically when you create the first
 // Microsoft.KubernetesConfiguration/fluxConfigurations in a cluster
 // But we're installing it by hand to control it more
-resource flux 'Microsoft.KubernetesConfiguration/extensions@2022-11-01' = {
+resource flux 'Microsoft.KubernetesConfiguration/extensions@2023-05-01' = {
   name: 'flux'
   scope: cluster
   properties: {
@@ -437,24 +422,25 @@ resource flux 'Microsoft.KubernetesConfiguration/extensions@2022-11-01' = {
         releaseNamespace: 'flux-system'
       }
     }
+    /*  *** If we want to deploy the image reflector and image automation (instead of relying on helm) ***
     configurationSettings: {
       // https://fluxcd.io/flux/components/
       'source-controller.enabled': 'true'
       'kustomize-controller.enabled': 'true'
       'helm-controller.enabled': 'true'
       // https://fluxcd.io/flux/components/notification/ can generate events for source changes
-      'notification-controller.enabled': 'false'
+      'notification-controller.enabled': 'true'
       // https://fluxcd.io/flux/components/image/ can update the Git repository when new container images are available
       'image-automation-controller.enabled': 'true'
       'image-reflector-controller.enabled': 'true'
-    }
+    } // */
   }
   // NOTE: Microsoft.KubernetesConfiguration/extensions MUST BE SEQUENTIAL
   // SEE: https://github.com/Azure/AKS-Construction/issues/385
   // dependsOn: [...]
 }
 
-resource fluxConfig 'Microsoft.KubernetesConfiguration/fluxConfigurations@2022-11-01' = {
+resource fluxConfig 'Microsoft.KubernetesConfiguration/fluxConfigurations@2023-05-01' = {
   name: 'bootstrap'
   scope: cluster
 

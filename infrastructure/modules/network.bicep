@@ -12,7 +12,7 @@ param vnetAddressPrefix string = '10.100.0.0/16'
 
 var vnetName = 'vnet-${baseName}'
 
-resource vnet 'Microsoft.Network/virtualNetworks@2021-02-01' = {
+resource vnet 'Microsoft.Network/virtualNetworks@2023-05-01' = {
   name: vnetName
   location: location
   tags: tags

@@ -16,7 +16,7 @@ param enabledForDeployment bool = false
 @description('Optional. Determines whether Azure Disk Encryption is able retrieve secrets and unwrap keys. Defaults to false.')
 param enabledForDiskEncryption bool = false
 
-resource vault 'Microsoft.KeyVault/vaults@2022-07-01' = {
+resource vault 'Microsoft.KeyVault/vaults@2023-02-01' = {
   name: 'kv-${baseName}'
   location: location
   tags: tags

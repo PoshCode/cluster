@@ -225,10 +225,19 @@ module aks 'modules/managedCluster.bicep' = {
     tenantId: tenantId
     additionalNodePoolProfiles: additionalNodePoolProfiles
     dnsServiceIP: dnsServiceIP
-    diagnosticCategories: diagnosticCategories
   }
 }
 
+module alerts 'modules/metricAlerts.bicep' = {
+  name: '${deploymentName}_alerts'
+  dependsOn: [aks]
+  params: {
+    baseName: baseName
+    location: location
+    logAnalyticsWorkspaceResourceID: logAnalytics.id
+    diagnosticCategories: diagnosticCategories
+  }
+}
 
 module aks_iam1 'modules/resourceRoleAssignment.bicep' = {
   name: '${deploymentName}_aks_iam1'
@@ -280,7 +289,6 @@ output userAssignedIdentityPrincipalId string = uai.outputs.principalId
 
 @description('User Assigned Identity Client ID, used for application config (so we can use this identity from code)')
 output userAssignedIdentityClientId string = uai.outputs.clientId
-
 
 output LogAnalyticsName string = logAnalytics.name
 output LogAnalyticsGuid string = logAnalytics.properties.customerId
