@@ -214,7 +214,6 @@ module aks 'modules/managedCluster.bicep' = {
     }
     controlPlaneUpgradeChannel: controlPlaneUpgradeChannel
     clusterNodeOSUpgradeChannel: clusterNodeOSUpgradeChannel
-    gitOpsRepositoryUrl: gitOpsRepositoryUrl
     // nodeSubnetId: vnet.outputs.nodeSubnetId
     kubernetesVersion: kubernetesVersion
     AutoscaleProfile: AutoscaleProfile
@@ -228,6 +227,14 @@ module aks 'modules/managedCluster.bicep' = {
     tenantId: tenantId
     additionalNodePoolProfiles: additionalNodePoolProfiles
     dnsServiceIP: dnsServiceIP
+  }
+}
+
+module flux 'modules/flux.bicep' = {
+  name: '${deploymentName}_flux'
+  params: {
+    baseName: baseName
+    gitOpsRepositoryUrl: gitOpsRepositoryUrl
   }
 }
 
@@ -279,7 +286,7 @@ module keyvault_kubelet_iam 'modules/resourceRoleAssignment.bicep' = {
 }
 
 @description('Flux release namespace')
-output fluxReleaseNamespace string = aks.outputs.fluxReleaseNamespace
+output fluxReleaseNamespace string = flux.outputs.fluxReleaseNamespace
 
 @description('Cluster ID')
 output clusterId string = aks.outputs.id
