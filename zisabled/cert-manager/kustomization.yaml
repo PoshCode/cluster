@@ -1,6 +1,6 @@
 resources:
   - namespace.yaml
-  - helm-release.yaml
+  - release.yaml
 
 configMapGenerator:
   - name: cert-manager-values

@@ -1,0 +1,30 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: traefik
+  namespace: flux-system
+spec:
+  interval: 30m
+  timeout: 5m
+  releaseName: traefik
+  targetNamespace: ingress
+  chart:
+    spec:
+      chart: traefik
+      version: "24.x"
+      sourceRef:
+        kind: HelmRepository
+        name: traefik
+        namespace: flux-system
+      interval: 12h
+  install:
+    remediation:
+      retries: 2
+  upgrade:
+    remediation:
+      retries: 5
+  rollback:
+    timeout: 5m
+  valuesFrom:
+  - kind: ConfigMap
+    name: traefik-values

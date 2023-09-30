@@ -1,8 +1,14 @@
 // ATTENTION PERSON WHO COPIES THIS IN THE FUTURE:
-// baseName MUST be hard-coded here (change "Required" to "Optional" and uncomment the deffinition)
-// baseName MUST also match the name of your app in Kubernetes (do not leave it as an empty string!)
-@description('Required. The base name')
-param baseName string // = ''
+// namespace MUST be hard-coded here (change "Required" to "Optional" and uncomment the deffinition)
+// namespace MUST match the namespace of your app in Kubernetes (do not leave it as an empty string!)
+@description('Required. The kubernetes namespace for your user')
+param namespace string // = ''
+
+@description('Required. The name of the service account. E.g. namespace-workload-identity')
+param serviceAccountName string = '${namespace}-workload-identity'
+
+@description('Required. The OpenID Connect Issuerl URL. E.g. aks.oidcIssuerUrl')
+param oidcIssuerUrl string
 
 // 63 is our max deployment name, and the longest name in our sub-deployments is 12 characters, 63-12 = 51
 @description('Optional. Provide unique deployment name prefix for the module references. Defaults to take(deploymentName().name, 51)')
@@ -15,30 +21,15 @@ param location string = resourceGroup().location
 @description('Optional. Override default tagging with your own tags. Defaults to resourceGroup().tags')
 param tags object = resourceGroup().tags
 
-module names 'br/lookups:names:7' = {
-  name: '${deploymentNamePrefix}__names'
-  params: {
-    baseName: baseName
-    location: location
-  }
-}
-
-module cluster 'br/lookups:akscluster:1' = {
-  name: '${deploymentNamePrefix}__cluster'
-  params: {
-    location: location
-  }
-}
-
-module uai 'br/resources:userassignedidentity:2.1.0' = {
+module uai 'userAssignedIdentity.bicep' = {
   name: '${deploymentNamePrefix}_uai'
   params: {
-    name: names.outputs.userAssignedIdentityName
+    baseName: '${namespace}-${serviceAccountName}'
     location: location
     tags: tags
     // This is the part that makes it work with AKS -- but the right-hand-side value must be YOUR workload identity
     azureADTokenExchangeFederatedIdentityCredentials: {
-      '${cluster.outputs.oidcIssuerUrl}': 'system:serviceaccount:${baseName}:${baseName}-workload-identity'
+      '${oidcIssuerUrl}': 'system:serviceaccount:${namespace}:${serviceAccountName}'
     }
   }
 }
@@ -70,14 +61,14 @@ module keyvault_kubelet_iam 'br/resources:resourceroleassignment:1.0.2' = {
 // */
 
 @description('The ResourceId is sometimes used for deployment scripts')
-output userAssignedResourceId string = uai.outputs.userAssignedResourceID
+output userAssignedResourceId string = uai.outputs.id
 
 @description('The PrincipalId is used for Azure Resource Role Assignements')
-output userAssignedIdentityPrincipalId string = uai.outputs.userAssignedIdentityPrincipalId
+output userAssignedIdentityPrincipalId string = uai.outputs.principalId
 
 @description('''User Assigned Client ID, put this in your patch-ServiceAccount.yaml:
 metadata:
-  name: ${app_name}-workload-identity
+  name: serviceAccountName
   annotations:
     azure.workload.identity/client-id: HERE''')
-output userAssignedIdentityClientId string = uai.outputs.userAssignedIdentityClientId
+output userAssignedIdentityClientId string = uai.outputs.clientId

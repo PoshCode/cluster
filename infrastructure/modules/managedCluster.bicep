@@ -190,9 +190,8 @@ var additionalNodePools = union(!empty(additionalNodePoolProfiles) ? additionalN
 @description('Optional. By default AKS uses a system assigned managed identity.')
 param identity object = { type: 'SystemAssigned' }
 
-@description('A logAnalyticsWorkspaceId for kubernetes')
-param logAnalyticsWorkspaceResourceID string
-
+// @description('A logAnalyticsWorkspaceId for kubernetes')
+// param logAnalyticsWorkspaceResourceID string
 
 @description('A private AKS Kubernetes cluster')
 resource cluster 'Microsoft.ContainerService/managedClusters@2023-05-02-preview' = {
@@ -205,15 +204,61 @@ resource cluster 'Microsoft.ContainerService/managedClusters@2023-05-02-preview'
     tier: 'Free'
   }
   properties: {
-    kubernetesVersion: kubernetesVersion
-    dnsPrefix: baseName
-    // I really hate the default MC_ nonsense
-    nodeResourceGroup: '${resourceGroup().name}-aks'
-    publicNetworkAccess: 'Enabled'
+    aadProfile: {
+      managed: true
+      enableAzureRBAC: true
+      tenantID: tenantId
+    }
+    agentPoolProfiles: [ systemNodePool ]
+    apiServerAccessProfile: {
+      enablePrivateCluster: false
+      // authorizedIPRanges: [
+      //   '98.10.203.122'
+      //   '2603:7080:9902:7e70:9498:1aa:9c67:4601'
+      // ]
+      // privateDNSZone: 'none' // https://learn.microsoft.com/en-us/azure/aks/private-clusters#configure-private-dns-zone
+      // enablePrivateClusterPublicFQDN: true // only if privateClusterDNSZone = none
+    }
     autoUpgradeProfile: {
       nodeOSUpgradeChannel: clusterNodeOSUpgradeChannel
       upgradeChannel: controlPlaneUpgradeChannel
     }
+    autoScalerProfile: AutoscaleProfile
+    /* *** AzureMonitoring ***
+    azureMonitorProfile: {
+      logs: {
+        appMonitoring: {
+          enabled: true
+        }
+        containerInsights: {
+          enabled: true
+          logAnalyticsWorkspaceResourceId: logAnalyticsWorkspaceResourceID
+          windowsHostLogs: {
+            enabled: true
+          }
+        }
+      }
+      metrics: {
+        appMonitoringOpenTelemetryMetrics: {
+          enabled: true
+        }
+        enabled: true
+        kubeStateMetrics: {
+          metricAnnotationsAllowList: monitoringMetricAnnotations
+          metricLabelsAllowlist: monitoringMetricLabels
+        }
+      }
+    }
+    // */
+    // AAD enabled, no local accounts allowed
+    disableLocalAccounts: false
+    dnsPrefix: baseName
+    enablePodSecurityPolicy: false
+    enableRBAC: true
+    // For private clusters? Public clusters use dnsPrefix
+    //fqdnSubdomain: baseName
+
+    kubernetesVersion: kubernetesVersion
     linuxProfile: {
       adminUsername: vmAdminUser
       ssh: {
@@ -224,58 +269,11 @@ resource cluster 'Microsoft.ContainerService/managedClusters@2023-05-02-preview'
         ]
       }
     }
-    servicePrincipalProfile: {
-      clientId: 'msi'
-    }
-    aadProfile: {
-      managed: true
-      enableAzureRBAC: true
-      tenantID: tenantId
-    }
-    // AAD enabled, no local accounts allowed
-    disableLocalAccounts: false
-
-    addonProfiles: {
-      //* *** KeyVault CSI Provider ***
-      azureKeyvaultSecretsProvider: {
-        enabled: true
-        config: {
-          enableSecretRotation: 'true'
-          rotationPollInterval: '2m'
-        }
-      } // */
-
-      //* *** Log Analytics ***
-      omsagent: {
-        enabled: true
-        config: {
-          logAnalyticsWorkspaceResourceID: logAnalyticsWorkspaceResourceID
-        }
-      } // */
-
-      //* *** OSM is an Envoy based service mesh interface ***
-      // https://learn.microsoft.com/en-us/azure/aks/open-service-mesh-about
-      openServiceMesh: {
-        enabled: true
-        config: {}
-      } // */
-
-      azurepolicy: {
-        enabled: true
-        config: {
-          version: 'v2'
-        }
-      }
-    }
-    agentPoolProfiles: [ systemNodePool ]
-    enableRBAC: true
-    enablePodSecurityPolicy: false
-
     networkProfile: {
       networkPlugin: 'azure'
+      networkPluginMode: 'overlay'
       networkDataplane: 'cilium'
       networkPolicy: 'cilium'
-      networkPluginMode: 'overlay'
       outboundType: 'loadBalancer'
       // This is the cluster load balancer, not the outbound
       loadBalancerSku: 'Standard'
@@ -289,6 +287,14 @@ resource cluster 'Microsoft.ContainerService/managedClusters@2023-05-02-preview'
         }
       }
     }
+    // I really hate the default MC_ nonsense
+    nodeResourceGroup: '${resourceGroup().name}-aks'
+    nodeResourceGroupProfile: {
+      restrictionLevel: 'ReadOnly'
+    }
+    oidcIssuerProfile: {
+      enabled: true
+    }
     // privateLinkResources: [
     //   {
     //     //// id: '/subscriptions/167823da-0f70-4b25-992f-f29fdd28d520/resourcegroups/rg-aks-azusw2-dvo-dv1/providers/Microsoft.ContainerService/managedClusters/aks-aksinfra-azusw2-dvo-dv1/privateLinkResources/management'
@@ -300,27 +306,26 @@ resource cluster 'Microsoft.ContainerService/managedClusters@2023-05-02-preview'
     //     ]
     //   }
     // ]
-    apiServerAccessProfile: {
-      enablePrivateCluster: false
-      // authorizedIPRanges: [
-      //   '98.10.203.122'
-      //   '2603:7080:9902:7e70:9498:1aa:9c67:4601'
-      // ]
-      // privateDNSZone: 'none' // https://learn.microsoft.com/en-us/azure/aks/private-clusters#configure-private-dns-zone
-      // enablePrivateClusterPublicFQDN: true // only if privateClusterDNSZone = none
-    }
-    autoScalerProfile: AutoscaleProfile
+
+    publicNetworkAccess: 'Enabled'
     securityProfile: {
       workloadIdentity: {
         enabled: true
       }
-      defender: {
-        logAnalyticsWorkspaceResourceId: logAnalyticsWorkspaceResourceID
-        securityMonitoring: {
-          enabled: true
-        }
-      }
+      // defender: {
+      //   logAnalyticsWorkspaceResourceId: logAnalyticsWorkspaceResourceID
+      //   securityMonitoring: {
+      //     enabled: false
+      //   }
+      // }
     }
+
+    // We're using our own UAI
+    // servicePrincipalProfile: {
+    //   clientId: 'msi'
+    // }
+
+
     storageProfile: {
       diskCSIDriver: {
         enabled: true
@@ -331,9 +336,6 @@ resource cluster 'Microsoft.ContainerService/managedClusters@2023-05-02-preview'
       snapshotController: {
         enabled: true
       }
-    }
-    oidcIssuerProfile: {
-      enabled: true // required for workload identity
     }
     /* *** It's not clear what guardrails do ***
     guardrailsProfile: {
@@ -353,6 +355,39 @@ resource cluster 'Microsoft.ContainerService/managedClusters@2023-05-02-preview'
         updateMode: 'Auto'
       }
       // */
+    }
+    addonProfiles: {
+      //* *** KeyVault CSI Provider ***
+      azureKeyvaultSecretsProvider: {
+        enabled: true
+        config: {
+          enableSecretRotation: 'true'
+          rotationPollInterval: '2m'
+        }
+      } // */
+
+      /* *** Log Analytics ***
+      omsagent: {
+        enabled: true
+        config: {
+          logAnalyticsWorkspaceResourceID: logAnalyticsWorkspaceResourceID
+        }
+      } // */
+
+      /* *** OSM is an Envoy based service mesh interface ***
+      // https://learn.microsoft.com/en-us/azure/aks/open-service-mesh-about
+      openServiceMesh: {
+        enabled: true
+        config: {}
+      }
+      // */
+
+      azurepolicy: {
+        enabled: true
+        config: {
+          version: 'v2'
+        }
+      }
     }
   }
 }
@@ -452,7 +487,7 @@ resource fluxConfig 'Microsoft.KubernetesConfiguration/fluxConfigurations@2023-0
     gitRepository: {
       url: gitOpsRepositoryUrl
       syncIntervalInSeconds: 120
-      timeoutInSeconds: 600
+      timeoutInSeconds: 180
       // This is important, and is a magic value!
       localAuthRef: 'bootstrap-protected-parameters'
       repositoryRef: {
@@ -464,7 +499,7 @@ resource fluxConfig 'Microsoft.KubernetesConfiguration/fluxConfigurations@2023-0
         path: 'clusters/${baseName}'
         timeoutInSeconds: 600
         syncIntervalInSeconds: 120
-        retryIntervalInSeconds: 60
+        retryIntervalInSeconds: 660
         prune: true
       }
     }

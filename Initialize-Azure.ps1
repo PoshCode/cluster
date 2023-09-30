@@ -28,7 +28,7 @@ param(
 # "CiliumDataplanePreview" is not working as far as I can tell
 Get-AzProviderFeature -ProviderNamespace Microsoft.ContainerService -OutVariable enabledFeatures
 foreach ($feature in "AKS-KedaPreview", "AKSNetworkModePreview", "AzureOverlayPreview",
-    "EnableBlobCSIDriver", "EnableNetworkPolicy", "EnableWorkloadIdentityPreview",
+    "EnableBlobCSIDriver", "EnableNetworkPolicy", "EnableWorkloadIdentityPreview", "NRGLockdownPreview",
     "NodeOSUpgradeChannelPreview", "IPBasedLoadBalancerPreview") {
     if ($enabledFeatures.Name -notcontains $feature ) {
         Register-AzProviderFeature -FeatureName $feature -ProviderNamespace Microsoft.ContainerService
@@ -38,7 +38,7 @@ foreach ($feature in "AKS-KedaPreview", "AKSNetworkModePreview", "AzureOverlayPr
 Get-AzProviderFeature -ProviderNamespace Microsoft.KubernetesConfiguration -OutVariable enabledFeatures
 foreach ($feature in "FluxConfigurations") {
     if ($enabledFeatures.Name -notcontains $feature ) {
-        Register-AzProviderFeature -FeatureName $feature -ProviderNamespace Microsoft.ContainerService
+        Register-AzProviderFeature -FeatureName $feature -ProviderNamespace Microsoft.KubernetesConfiguration
     }
 }
 
@@ -69,7 +69,7 @@ gh secret set --repo https://github.com/$repo AZURE_RG -b $resourceGroupName
 # gh secret set --repo https://github.com/$repo USER_OBJECT_ID -b $spId
 
 # This stuff doesn't HAVE to be done...
-$admins = (Get-AzADGroup -Filter "DisplayName eq 'AksAdmins'") ??
+$admins   = (Get-AzADGroup -Filter "DisplayName eq 'AksAdmins'") ??
             (New-AzADGroup -DisplayName AksAdmins -MailNickname AksAdmins -Description "Kubernetes Admins")
 
 gh secret set --repo https://github.com/$repo ADMIN_GROUP_ID -b $admins.Id

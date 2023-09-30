@@ -43,6 +43,7 @@ param dnsServiceIP string = '10.100.0.10'
 @description('Optional. Pod CIDR for this cluster. Defaults to: 10.192.0.0/16')
 param podCidr string = '10.192.0.0/16'
 
+/*
 @description('The Log Analytics retention period')
 param logRetentionInDays int = 30
 
@@ -56,6 +57,7 @@ param diagnosticCategories array = [
   'kube-audit-admin'
   'guard'
 ]
+*/
 
 @description('Optional. The AKS AutoscaleProfile has complex defaults I expect to change in production.')
 param AutoscaleProfile object = {
@@ -140,33 +142,34 @@ param clusterNodeOSUpgradeChannel string = 'NodeImage'
 // For subdeployments, prefix our name (which is hopefully unique/time-stamped)
 var deploymentName = deployment().name
 
-resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2022-10-01' = {
-  name: 'la-${baseName}'
-  location: location
-  tags: tags
-  properties:  union({
-      retentionInDays: logRetentionInDays
-      sku: {
-        name: 'PerNode'
-      }
-    },
-    logDataCap>0 ? { workspaceCapping: {
-      dailyQuotaGb: logDataCap
-    }} : {}
-  )
-}
+// resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2022-10-01' = {
+//   name: 'la-${baseName}'
+//   location: location
+//   tags: tags
+//   properties:  union({
+//       retentionInDays: logRetentionInDays
+//       sku: {
+//         name: 'PerNode'
+//       }
+//     },
+//     logDataCap>0 ? { workspaceCapping: {
+//       dailyQuotaGb: logDataCap
+//     }} : {}
+//   )
+// }
 
-resource containerLogsV2_Basiclogs 'Microsoft.OperationalInsights/workspaces/tables@2022-10-01' = {
-  name: 'ContainerLogV2'
-  parent: logAnalytics
-  properties: {
-    plan: 'Basic'
-  }
-  dependsOn: [
-    aks
-  ]
-}
+// resource containerLogsV2_Basiclogs 'Microsoft.OperationalInsights/workspaces/tables@2022-10-01' = {
+//   name: 'ContainerLogV2'
+//   parent: logAnalytics
+//   properties: {
+//     plan: 'Basic'
+//   }
+//   dependsOn: [
+//     aks
+//   ]
+// }
 
+// The actual cluster's identity does not need federation
 module uai 'modules/userAssignedIdentity.bicep' = {
   name: '${deploymentName}_uai'
   params: {
@@ -216,7 +219,7 @@ module aks 'modules/managedCluster.bicep' = {
     kubernetesVersion: kubernetesVersion
     AutoscaleProfile: AutoscaleProfile
     maxPodsPerNode: maxPodsPerNode
-    logAnalyticsWorkspaceResourceID: logAnalytics.id
+    // logAnalyticsWorkspaceResourceID: logAnalytics.id
     serviceCidr: serviceCidr
     podCidr: podCidr
     systemNodePoolOption: systemNodePoolOption
@@ -228,16 +231,16 @@ module aks 'modules/managedCluster.bicep' = {
   }
 }
 
-module alerts 'modules/metricAlerts.bicep' = {
-  name: '${deploymentName}_alerts'
-  dependsOn: [aks]
-  params: {
-    baseName: baseName
-    location: location
-    logAnalyticsWorkspaceResourceID: logAnalytics.id
-    diagnosticCategories: diagnosticCategories
-  }
-}
+// module alerts 'modules/metricAlerts.bicep' = {
+//   name: '${deploymentName}_alerts'
+//   dependsOn: [aks]
+//   params: {
+//     baseName: baseName
+//     location: location
+//     logAnalyticsWorkspaceResourceID: logAnalytics.id
+//     diagnosticCategories: diagnosticCategories
+//   }
+// }
 
 module aks_iam1 'modules/resourceRoleAssignment.bicep' = {
   name: '${deploymentName}_aks_iam1'
@@ -290,6 +293,6 @@ output userAssignedIdentityPrincipalId string = uai.outputs.principalId
 @description('User Assigned Identity Client ID, used for application config (so we can use this identity from code)')
 output userAssignedIdentityClientId string = uai.outputs.clientId
 
-output LogAnalyticsName string = logAnalytics.name
-output LogAnalyticsGuid string = logAnalytics.properties.customerId
-output LogAnalyticsId string = logAnalytics.id
+// output LogAnalyticsName string = logAnalytics.name
+// output LogAnalyticsGuid string = logAnalytics.properties.customerId
+// output LogAnalyticsId string = logAnalytics.id

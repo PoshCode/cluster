@@ -40,7 +40,9 @@ kubeVersion: ""
 extraDeploy: []
 ## @param commonLabels Labels to add to all deployed objects
 ##
-commonLabels: {}
+commonLabels: {
+  release: monitoring
+}
 ## @param commonAnnotations Annotations to add to all deployed objects
 ##
 commonAnnotations: {}
@@ -1351,10 +1353,10 @@ metrics:
   serviceMonitor:
     ## @param metrics.serviceMonitor.namespace Specify if the servicemonitors will be deployed into a different namespace (blank deploys into same namespace as chart)
     ##
-    namespace: ""
+    namespace: "monitor"
     ## @param metrics.serviceMonitor.enabled Specify if a servicemonitor will be deployed for prometheus-operator.
     ##
-    enabled: false
+    enabled: true
     ## @param metrics.serviceMonitor.jobLabel Specify the jobLabel to use for the prometheus-operator
     ##
     jobLabel: "app.kubernetes.io/name"
