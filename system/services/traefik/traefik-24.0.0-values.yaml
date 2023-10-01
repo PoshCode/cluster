@@ -18,7 +18,7 @@ commonLabels: {}
 deployment:
   # -- Enable deployment
   enabled: true
-  # -- Deployment or DaemonSet
+  # -- Deployment or DaemonSet (should match externalTrafficPolicy Cluster or Local)
   kind: Deployment
   # -- Number of pods of the deployment (only applies when kind == Deployment)
   replicas: 1
@@ -220,7 +220,7 @@ providers:
       # - "default"
     # IP used for Kubernetes Ingress endpoints
     publishedService:
-      enabled: false
+      enabled: true
       # Published Kubernetes Service to copy status from. Format: namespace/servicename
       # By default this Traefik service
       # pathOverride: ""
@@ -727,8 +727,8 @@ service:
   labels: {}
   # -- Additional entries here will be added to the service spec.
   # -- Cannot contain type, selector or ports entries.
-  spec: {}
-    # externalTrafficPolicy: Cluster
+  spec:
+    externalTrafficPolicy: Cluster
     # loadBalancerIP: "1.2.3.4"
     # clusterIP: "2.3.4.5"
   loadBalancerSourceRanges: []
