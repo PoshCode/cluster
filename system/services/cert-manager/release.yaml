@@ -11,10 +11,10 @@ spec:
   chart:
     spec:
       chart: cert-manager
-      version: "0.12.x"
+      version: "1.13.x"
       sourceRef:
         kind: HelmRepository
-        name: bitnami
+        name: jetstack
         namespace: flux-system
       interval: 12h
   install:
