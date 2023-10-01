@@ -3,7 +3,13 @@ kind: Ingress
 metadata:
   name: podinfo
   namespace: podinfo
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-staging
 spec:
+  tls:
+  - secretName: poshcode-staging
+    hosts:
+    - poshcode.com
   rules:
   - host: poshcode.com
     http:
