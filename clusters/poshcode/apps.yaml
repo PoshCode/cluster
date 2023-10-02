@@ -8,7 +8,7 @@ spec:
   retryInterval: 10m
   timeout: 5m
   dependsOn:
-    - name: services
+    - name: issuers
   sourceRef:
     kind: GitRepository
     name: bootstrap

@@ -1,16 +1,16 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
 kind: Kustomization
 metadata:
-  name: sources
+  name: crds
   namespace: flux-system
 spec:
-  interval: 1h
+  interval: 10h
   retryInterval: 10m
   timeout: 5m
   sourceRef:
     kind: GitRepository
     name: bootstrap
-  path: ./system/sources
+  path: ./system/crds
   prune: true
   wait: true
   commonMetadata:

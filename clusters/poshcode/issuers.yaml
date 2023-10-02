@@ -4,7 +4,7 @@ metadata:
   name: issuers
   namespace: flux-system
 spec:
-  interval: 30m
+  interval: 1h
   retryInterval: 10m
   timeout: 5m
   dependsOn:
