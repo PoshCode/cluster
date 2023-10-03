@@ -267,8 +267,8 @@ module aks_iam2 'modules/resourceRoleAssignment.bicep' = {
   }
 }
 
-module keyvault_devops_iam 'modules/resourceRoleAssignment.bicep' = {
-  name: '${deploymentName}_akvdvo_iam'
+module keyvault_devops_secrets 'modules/resourceRoleAssignment.bicep' = {
+  name: '${deploymentName}_akvdvo_secrets'
   params: {
     principalIds: [ adminId ]
     resourceId: keyVault.outputs.id
@@ -276,12 +276,30 @@ module keyvault_devops_iam 'modules/resourceRoleAssignment.bicep' = {
   }
 }
 
-module keyvault_kubelet_iam 'modules/resourceRoleAssignment.bicep' = {
-  name: '${deploymentName}_akv2k8s_iam'
+module keyvault_devops_crypto 'modules/resourceRoleAssignment.bicep' = {
+  name: '${deploymentName}_akvdvo_crypto'
+  params: {
+    principalIds: [ adminId ]
+    resourceId: keyVault.outputs.id
+    roleName: 'Key Vault Crypto User'
+  }
+}
+
+module keyvault_kubelet_secrets 'modules/resourceRoleAssignment.bicep' = {
+  name: '${deploymentName}_akv2k8s_secrets'
   params: {
     principalIds: [ aks.outputs.kubeletIdentityObjectId ]
     resourceId: keyVault.outputs.id
     roleName: 'Key Vault Secrets User'
+  }
+}
+
+module keyvault_kubelet_crypto 'modules/resourceRoleAssignment.bicep' = {
+  name: '${deploymentName}_akv2k8s_crypto'
+  params: {
+    principalIds: [ aks.outputs.kubeletIdentityObjectId ]
+    resourceId: keyVault.outputs.id
+    roleName: 'Key Vault Crypto User'
   }
 }
 

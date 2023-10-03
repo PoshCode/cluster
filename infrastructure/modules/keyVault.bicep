@@ -34,8 +34,23 @@ resource vault 'Microsoft.KeyVault/vaults@2023-02-01' = {
   }
 }
 
+resource sopsKey 'Microsoft.KeyVault/vaults/keys@2023-02-01' = {
+  parent: vault
+  name: 'sops-key'
+  properties: {
+    keyOps: [
+      'decrypt'
+      'encrypt'
+    ]
+  }
+}
+
+
 @description('Name of the keyvault')
 output name string = vault.name
 
 @description('Resource Id of the keyvault')
 output id string = vault.id
+
+@description('key for sops')
+output sopsKeyId string = sopsKey.id
