@@ -382,9 +382,9 @@ var builtInRoles = json(loadTextContent('roles.jsonc'))
 
 // pull the subscription id and resourceGroup name from the resource Id:
 // Input: /subscriptions/<id>/resourceGroups/<rg-name>/<resource-type>/<resource-id>
-var subscription = split(resourceId, '/resourceGroups/')
-var subscriptionId = split(subscription[0], 'subscriptions/')[1]
-var resourceGroupName = split(subscription[1], '/')[0]
+var splits = split(substring(resourceId, 1, length(resourceId) - 1), '/')
+var subscriptionId = splits[1]
+var resourceGroupName = splits[3]
 
 // For subdeployments, prefix our name (which is hopefully unique/time-stamped)
 var deploymentName = deployment().name

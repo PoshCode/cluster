@@ -445,3 +445,6 @@ output id string = cluster.id
 
 @description('User Assigned Object ID for the Kubelet Identity used to access the ACR. Used for Azure Role assignement for AcrPull to the ACR, and for granting Akv2K8s access to KeyVaults')
 output kubeletIdentityObjectId string = cluster.properties.identityProfile.kubeletidentity.objectId
+
+@description('The OIDC Issuer URL for federated credentials (Workload Identity)')
+output oidcIssuerUrl string = cluster.properties.oidcIssuerProfile.issuerURL

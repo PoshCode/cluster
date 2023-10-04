@@ -38,6 +38,7 @@ resource sopsKey 'Microsoft.KeyVault/vaults/keys@2023-02-01' = {
   parent: vault
   name: 'sops-key'
   properties: {
+    kty: 'RSA'
     keyOps: [
       'decrypt'
       'encrypt'

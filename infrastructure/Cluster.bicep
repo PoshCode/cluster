@@ -170,8 +170,8 @@ var deploymentName = deployment().name
 // }
 
 // The actual cluster's identity does not need federation
-module uai 'modules/userAssignedIdentity.bicep' = {
-  name: '${deploymentName}_uai'
+module kubeletId 'modules/userAssignedIdentity.bicep' = {
+  name: '${deploymentName}_uai_kubelet'
   params: {
     baseName: baseName
     location: location
@@ -209,7 +209,7 @@ module aks 'modules/managedCluster.bicep' = {
     identity: {
       type: 'UserAssigned'
       userAssignedIdentities: {
-        '${uai.outputs.id}': {}
+        '${kubeletId.outputs.id}': {}
       }
     }
     controlPlaneUpgradeChannel: controlPlaneUpgradeChannel
@@ -227,6 +227,20 @@ module aks 'modules/managedCluster.bicep' = {
     tenantId: tenantId
     additionalNodePoolProfiles: additionalNodePoolProfiles
     dnsServiceIP: dnsServiceIP
+  }
+}
+
+module fluxId 'modules/userAssignedIdentity.bicep' = {
+  name: '${deploymentName}_uai_flux_crypto'
+  params: {
+    baseName: 'flux_crypto'
+    location: location
+    tags: tags
+    azureADTokenExchangeFederatedIdentityCredentials: {
+      '${aks.outputs.oidcIssuerUrl}': 'system:serviceaccount:flux-system:source-controller'
+      '${aks.outputs.oidcIssuerUrl}': 'system:serviceaccount:flux-system:helm-controller'
+      '${aks.outputs.oidcIssuerUrl}': 'system:serviceaccount:flux-system:image-reflector-controller'
+    }
   }
 }
 
@@ -249,8 +263,8 @@ module flux 'modules/flux.bicep' = {
 //   }
 // }
 
-module aks_iam1 'modules/resourceRoleAssignment.bicep' = {
-  name: '${deploymentName}_aks_iam1'
+module iam_admin_aks 'modules/resourceRoleAssignment.bicep' = {
+  name: '${deploymentName}_iam_admin_aks'
   params: {
     principalIds: [ adminId ]
     resourceId: aks.outputs.id
@@ -258,17 +272,8 @@ module aks_iam1 'modules/resourceRoleAssignment.bicep' = {
   }
 }
 
-module aks_iam2 'modules/resourceRoleAssignment.bicep' = {
-  name: '${deploymentName}_aks_iam2'
-  params: {
-    principalIds: [ adminId ]
-    resourceId: aks.outputs.id
-    roleName: 'Azure Kubernetes Service RBAC Reader'
-  }
-}
-
-module keyvault_devops_secrets 'modules/resourceRoleAssignment.bicep' = {
-  name: '${deploymentName}_akvdvo_secrets'
+module iam_admin_kv_secrets 'modules/resourceRoleAssignment.bicep' = {
+  name: '${deploymentName}_iam_admin_kv_secrets'
   params: {
     principalIds: [ adminId ]
     resourceId: keyVault.outputs.id
@@ -276,28 +281,19 @@ module keyvault_devops_secrets 'modules/resourceRoleAssignment.bicep' = {
   }
 }
 
-module keyvault_devops_crypto 'modules/resourceRoleAssignment.bicep' = {
-  name: '${deploymentName}_akvdvo_crypto'
+module iam_admin_kv_crypto 'modules/resourceRoleAssignment.bicep' = {
+  name: '${deploymentName}_iam_admin_kv_crypto'
   params: {
     principalIds: [ adminId ]
     resourceId: keyVault.outputs.id
-    roleName: 'Key Vault Crypto User'
+    roleName: 'Key Vault Crypto Officer'
   }
 }
 
-module keyvault_kubelet_secrets 'modules/resourceRoleAssignment.bicep' = {
-  name: '${deploymentName}_akv2k8s_secrets'
+module iam_flux_crypto 'modules/resourceRoleAssignment.bicep' = {
+  name: '${deploymentName}_iam_flux_crypto'
   params: {
-    principalIds: [ aks.outputs.kubeletIdentityObjectId ]
-    resourceId: keyVault.outputs.id
-    roleName: 'Key Vault Secrets User'
-  }
-}
-
-module keyvault_kubelet_crypto 'modules/resourceRoleAssignment.bicep' = {
-  name: '${deploymentName}_akv2k8s_crypto'
-  params: {
-    principalIds: [ aks.outputs.kubeletIdentityObjectId ]
+    principalIds: [ fluxId.outputs.principalId ]
     resourceId: keyVault.outputs.id
     roleName: 'Key Vault Crypto User'
   }
@@ -310,13 +306,13 @@ output fluxReleaseNamespace string = flux.outputs.fluxReleaseNamespace
 output clusterId string = aks.outputs.id
 
 @description('User Assigned Identity Resource ID, required by deployment scripts')
-output userAssignedResourceID string = uai.outputs.id
+output userAssignedResourceID string = kubeletId.outputs.id
 
 @description('User Assigned Identity Object ID, used for Azure Role assignement')
-output userAssignedIdentityPrincipalId string = uai.outputs.principalId
+output userAssignedIdentityPrincipalId string = kubeletId.outputs.principalId
 
 @description('User Assigned Identity Client ID, used for application config (so we can use this identity from code)')
-output userAssignedIdentityClientId string = uai.outputs.clientId
+output userAssignedIdentityClientId string = kubeletId.outputs.clientId
 
 // output LogAnalyticsName string = logAnalytics.name
 // output LogAnalyticsGuid string = logAnalytics.properties.customerId
