@@ -8,24 +8,27 @@
 #>
 [CmdletBinding()]
 param(
+    # The base name to use. E.g. the "cluster" name
+    [Parameter(Mandatory = $true)]
+    [string]$baseName,
+
     # If set, will remove the existing app and service principal, so we can recreate it.
     [switch]$RemoveExisting,
 
-    # The resource group to create. E.g. "rg-poshcode"
-    [string]$resourceGroupName = "rg-poshcode",
-
     # The location to create the resource group in. E.g. "eastus"
     [string]$location = "eastus",
-
-    # The service name to use. E.g. "rg-poshcode-deploy"
-    [string]$serviceName = "rg-poshcode-deploy",
 
     # The repo to set secrets for. E.g. "PoshCode/cluster"
     [string]$repo = "PoshCode/cluster"
 )
 
+# The resource group to create. E.g. "rg-cluster"
+$resourceGroupName = "rg-${baseName}"
+
+# The service name to use. E.g. "rg-cluster-deploy"
+$serviceName = "rg-${baseName}-deploy"
+
 # Register a bunch of preview features
-# "CiliumDataplanePreview" is not working as far as I can tell
 Get-AzProviderFeature -ProviderNamespace Microsoft.ContainerService -OutVariable enabledFeatures
 foreach ($feature in "AKS-KedaPreview", "AKSNetworkModePreview", "AzureOverlayPreview",
     "EnableBlobCSIDriver", "EnableNetworkPolicy", "EnableWorkloadIdentityPreview", "NRGLockdownPreview",
@@ -68,7 +71,7 @@ gh secret set --repo https://github.com/$repo AZURE_SUBSCRIPTION_ID -b $ctx.Subs
 gh secret set --repo https://github.com/$repo AZURE_RG -b $resourceGroupName
 # gh secret set --repo https://github.com/$repo USER_OBJECT_ID -b $spId
 
-# This stuff doesn't HAVE to be done...
+# Create an AD Group to be administrators of the cluster:
 $admins   = (Get-AzADGroup -Filter "DisplayName eq 'AksAdmins'") ??
             (New-AzADGroup -DisplayName AksAdmins -MailNickname AksAdmins -Description "Kubernetes Admins")
 

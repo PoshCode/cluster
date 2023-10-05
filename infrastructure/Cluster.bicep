@@ -250,6 +250,8 @@ module flux 'modules/flux.bicep' = {
     baseName: baseName
     gitOpsRepositoryUrl: gitOpsRepositoryUrl
   }
+  // technically not, but we're using the deploy to cause some delays...
+  dependsOn: [ aks, fluxId ]
 }
 
 // module alerts 'modules/metricAlerts.bicep' = {
@@ -297,6 +299,8 @@ module iam_flux_crypto 'modules/resourceRoleAssignment.bicep' = {
     resourceId: keyVault.outputs.id
     roleName: 'Key Vault Crypto User'
   }
+  // technically not, but we're using the deploy to cause a delay...
+  dependsOn: [ flux ]
 }
 
 @description('Flux release namespace')
@@ -313,6 +317,9 @@ output userAssignedIdentityPrincipalId string = kubeletId.outputs.principalId
 
 @description('User Assigned Identity Client ID, used for application config (so we can use this identity from code)')
 output userAssignedIdentityClientId string = kubeletId.outputs.clientId
+
+@description('Uri for the sops-key to be used for secret encryption')
+output sopsKeyId string = keyVault.outputs.sopsKeyId
 
 // output LogAnalyticsName string = logAnalytics.name
 // output LogAnalyticsGuid string = logAnalytics.properties.customerId
