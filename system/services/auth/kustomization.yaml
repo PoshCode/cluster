@@ -7,9 +7,9 @@ resources:
 - deployment.yaml
 - service.yaml
 - ingress.yaml
-- auth-middleware.yaml
-- forwardauth-middleware.yaml
-- https-middleware.yaml
+- middleware/auth.yaml
+- middleware/forward-auth.yaml
+- middleware/https.yaml
 - secret.yaml
 
 #

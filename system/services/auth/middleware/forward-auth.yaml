@@ -4,6 +4,6 @@ metadata:
   name: traefik-forward-auth
 spec:
   forwardAuth:
-    address: http://traefik-forward-auth.auth
+    address: http://traefik-forward-auth.secure
     authResponseHeaders:
       - X-Forwarded-User

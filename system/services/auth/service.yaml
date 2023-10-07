@@ -11,4 +11,5 @@ spec:
   ports:
   - name: http
     port: 4181
-    targetPort: 4181
+    protocol: TCP
+    targetPort: http

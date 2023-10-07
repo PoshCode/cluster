@@ -21,10 +21,12 @@ spec:
     spec:
       terminationGracePeriodSeconds: 60
       containers:
-      - image: ghcr.io/jordemort/traefik-forward-auth:latest
-        name: traefik-forward-auth
+      - name: traefik-forward-auth
+        image: ghcr.io/jordemort/traefik-forward-auth:latest
+        imagePullPolicy: IfNotPresent
         ports:
-        - containerPort: 4181
+        - name: http
+          containerPort: 4181
           protocol: TCP
         env:
         - name: DOMAIN
@@ -35,7 +37,6 @@ spec:
           value: "auth.poshcode.com"
         - name: LOG_LEVEL
           value: "info"
-
         - name: DEFAULT_PROVIDER
           value: "oidc"
         - name: PROVIDERS_OIDC_ISSUER_URL
