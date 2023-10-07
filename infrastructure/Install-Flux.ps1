@@ -48,14 +48,18 @@ param(
 
     # Uri of the git repository to bootstrap flux with.
     # E.g. ssh://git@github.com:PoshCode/cluster.git
-    $GitRepositoryUri = "ssh://git@github.com:PoshCode/cluster.git",
+    $GitRepositoryUri = "ssh://git@github.com/PoshCode/cluster.git",
+
+    # Even in automation, we want to customize the comment on the key
+    $KeyGenComment = "Flux Bootstrapped By https://github.com/Jaykul/",
 
     # The SSH key file for authenticating to the git repository
-    $KeyFile,
+    $KeyFile = "$HOME/.ssh/secret-id",
 
     # The passphrase for the SSH key file
-    [SecureString]$KeyPassphrase
+    [SecureString]$KeyPassphrase = $global:KeyPassphrase
 )
+Push-Location $PSScriptRoot/.. -StackName InstallFlux
 
 # it's literally just a single file binary, but it comes in a zip/tar.gz so we'll just use the install script
 $version = if (Get-Command flux) {
@@ -71,20 +75,24 @@ if ($version -lt '2.1.1') {
 }
 $ErrorActionPreference = 'Stop'
 
-if (!$KeyFile) {
-    $KeyFile = "secret-id"
-    $KeyPassphrase = 1..(Get-Random -Minimum 3 -Maximum 6) | ForEach-Object { New-Guid } |
-        Split-String -Separator "-" | Get-Random -Count 10 | Join-String -Separator "-" |
-        ConvertTo-SecureString -AsPlainText -Force
-    ssh-keygen -t ed25519 -C "Jaykul@HuddledMasses.org" -f $KeyFile -N="$($KeyPassphrase | ConvertFrom-SecureString -AsPlainText)"
-    $repo = ($GitRepositoryUri -split "github.com[:/]")[-1]
-    gh repo deploy-key add secret-id.pub --repo $repo --title "Flux Bootstrap"
-}
+$repo = $GitRepositoryUri -replace ".*git@[^/]+/|.git$"
 
-Push-Location $PSScriptRoot/.. -StackName InstallFlux
+"y" |
+flux bootstrap git --url=$GitRepositoryUri --branch=main --path="clusters/$BaseName" `
+--verbose --components-extra "image-reflector-controller,image-automation-controller" |
+    ForEach-Object {
+        $_
+        if ($_ -match "public key: (.*)") {
+            $Matches[1] > flux-key.pub
+            gh repo deploy-key add flux-key.pub --repo $repo --title "Flux Bootstrap"
+        }
+    }
 
-flux bootstrap git --url=$GitRepositoryUri --branch=main --path=clusters/$BaseName `
---private-key-file=(Resolve-Path $KeyFile) --private-key-passphrase=$KeyPassphrase `
---components-extra image-reflector-controller, image-automation-controller
+#--private-key-file=$KeyFile `
 
 Pop-Location -StackName InstallFlux
+
+
+filter base64 {
+    [System.Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($_))
+}

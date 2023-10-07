@@ -11,7 +11,7 @@ patches:
       metadata:
         name: controller
         annotations:
-          azure.workload.identity/client-id: ${client_id}
+          azure.workload.identity/client-id: 429675bd-e5c8-41fe-9ac7-1055f14261e6
           azure.workload.identity/tenant-id: b3714c3f-ecbc-453f-8ae4-ddeeb141a966
     target:
       kind: ServiceAccount

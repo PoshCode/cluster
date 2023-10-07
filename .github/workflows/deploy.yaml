@@ -36,7 +36,7 @@ jobs:
         run: '"name=aks-$(Get-Date -f yyyyMMddThhmmss)" >> $Env:GITHUB_OUTPUT'
 
       - uses: azure/arm-deploy@v1
-        name: ARM deploy
+        name: deploy
         timeout-minutes: 240
         with:
           template: infrastructure/Cluster.json
@@ -45,14 +45,14 @@ jobs:
           parameters: adminId=${{ secrets.ADMIN_GROUP_ID }}
           deploymentName: ${{ steps.name.outputs.name }}
 
-    # with:
-    #   templateVersion: 0.9.10
-    #   rg: rg-poshcode
-    #   resourceName: poshcode
-    #   templateParams: resourceName=poshcode agentCount=0 upgradeChannel=stable agentCountMax=3 custom_vnet=true vnetAksSubnetAddressPrefix=10.240.0.0/24 bastion=true enable_aad=true AksDisableLocalAccounts=true enableAzureRBAC=true adminPrincipalId=_USER_OBJECT_ID_ networkPolicy=calico openServiceMeshAddon=true azurepolicy=audit authorizedIPRanges=["98.10.203.122"] maxPods=40 keyVaultKmsCreate=true keyVaultKmsOfficerRolePrincipalId=_USER_OBJECT_ID_ fluxGitOpsAddon=true createNatGateway=true aksOutboundTrafficType=userAssignedNATGateway natGwIdleTimeout=20 kedaAddon=true blobCSIDriver=true oidcIssuer=true workloadIdentity=true networkPluginMode=Overlay
-    #   postScriptParams: "ingress=contour,monitor=oss"
-    # secrets:
-    #   AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-    #   AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-    #   AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-    #   USER_OBJECT_ID: ${{ secrets.USER_OBJECT_ID }}
+      # - id: deploy-flux
+      #   shell: pwsh
+      #   run: |
+      #     $kustomize = Get-Content "clusters/poschode/flux/kustomization.ps1"
+      #     $kustomize = $kustomize -replace "azure.workload.identity/client-id: .*$", "azure.workload.identity/client-id: ${{ steps.deploy.outputs.fluxIdClientId }}"
+      #     # TODO: commit this file to the repo _before_ running flux
+      #     $kustomize | Set-Content "clusters/poschode/flux/kustomization.ps1"
+      #     ./infrastructure/Install-Flux.ps1
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
