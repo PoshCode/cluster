@@ -11,7 +11,7 @@ spec:
     - name: issuers
   sourceRef:
     kind: GitRepository
-    name: bootstrap
+    name: flux-system
   path: ./apps
   prune: true
   wait: true

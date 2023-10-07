@@ -9,7 +9,7 @@ spec:
   timeout: 5m
   sourceRef:
     kind: GitRepository
-    name: bootstrap
+    name: flux-system
   path: ./system/crds
   prune: true
   wait: true

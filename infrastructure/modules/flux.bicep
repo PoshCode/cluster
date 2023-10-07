@@ -42,7 +42,7 @@ resource flux 'Microsoft.KubernetesConfiguration/extensions@2023-05-01' = {
 }
 
 resource fluxConfig 'Microsoft.KubernetesConfiguration/fluxConfigurations@2023-05-01' = {
-  name: 'bootstrap'
+  name: 'flux-system'
   scope: cluster
 
   properties: {
