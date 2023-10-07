@@ -1,19 +1,17 @@
-#
-# Traefik Forward Auth Deployment
-#
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: traefik-forward-auth
-  labels:
-    app: traefik-forward-auth
 spec:
+  minReadySeconds: 3
   replicas: 1
+  revisionHistoryLimit: 5
+  progressDeadlineSeconds: 60
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app: traefik-forward-auth
-  strategy:
-    type: Recreate
   template:
     metadata:
       labels:
@@ -36,7 +34,12 @@ spec:
         - name: AUTH_HOST
           value: "auth.poshcode.com"
         - name: LOG_LEVEL
-          value: "info"
+          value: "trace"
+        - name: SECRET
+          valueFrom:
+            secretKeyRef:
+              name: azuread
+              key: random_secret
         - name: DEFAULT_PROVIDER
           value: "oidc"
         - name: PROVIDERS_OIDC_ISSUER_URL
@@ -54,11 +57,6 @@ spec:
             secretKeyRef:
               name: azuread
               key: client_secret
-        - name: SECRET
-          valueFrom:
-            secretKeyRef:
-              name: azuread
-              key: random_secret
         # - name: CONFIG
         #   value: "/config"
         resources:
