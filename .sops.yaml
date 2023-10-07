@@ -1,0 +1,5 @@
+creation_rules:
+  - path_regex: .*.yaml
+    encrypted_regex: ^(data|stringData)$
+    azure_keyvault: https://kv-joel.vault.azure.net/keys/sops-key/5ef3f03a360140bbb419a997adb4ea3d,https://kv-poshcode.vault.azure.net/keys/sops-key/f49a0e054ffe451a85df33e5cdf7946a
+    age: age12nc5tc37e70nxpjn7rulvn650l6wztftq75audd4nftpue4jp3uqdac6el
