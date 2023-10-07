@@ -233,7 +233,7 @@ module aks 'modules/managedCluster.bicep' = {
 module fluxId 'modules/userAssignedIdentity.bicep' = {
   name: '${deploymentName}_uai_fluxId'
   params: {
-    baseName: 'flux_crypto'
+    baseName: 'flux'
     location: location
     tags: tags
     azureADTokenExchangeFederatedIdentityCredentials: {
