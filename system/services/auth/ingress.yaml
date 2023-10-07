@@ -1,24 +1,24 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: podinfo
-  namespace: podinfo
+  name: auth-ingress
+
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-production
     traefik.ingress.kubernetes.io/router.middlewares: secure-auth@kubernetescrd
 spec:
   tls:
-  - secretName: poshcode-tls
+  - secretName: auth-tls
     hosts:
-    - poshcode.com
+    - auth.poshcode.com
   rules:
-  - host: poshcode.com
+  - host: auth.poshcode.com
     http:
       paths:
       - path: /
         pathType: Prefix
         backend:
           service:
-            name: podinfo
+            name: traefik-forward-auth
             port:
               name: http

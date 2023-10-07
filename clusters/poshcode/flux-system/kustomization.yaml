@@ -15,7 +15,7 @@ patches:
           azure.workload.identity/tenant-id: b3714c3f-ecbc-453f-8ae4-ddeeb141a966
     target:
       kind: ServiceAccount
-      name: "(source-controller|image-reflector-controller)"
+      name: "(source-controller|helm-controller|image-reflector-controller|kustomize-controller)"
   - patch: |
       apiVersion: apps/v1
       kind: Deployment
@@ -30,7 +30,22 @@ patches:
               azure.workload.identity/use: "true"
     target:
       kind: Deployment
-      name: "(source-controller|image-reflector-controller)"
+      name: "(source-controller|helm-controller|image-reflector-controller|kustomize-controller)"
+  # SOPS Configuration
+  - patch: |
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: controller
+      spec:
+        containers:
+        - name: manager
+          env:
+          - name: AZURE_AUTH_METHOD
+            value: msi
+    target:
+      kind: Deployment
+      name: "(kustomize-controller)"
   # Enable OOM watch feature
   - patch: |
       - op: add

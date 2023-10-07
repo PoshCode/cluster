@@ -240,6 +240,7 @@ module fluxId 'modules/userAssignedIdentity.bicep' = {
       '${aks.outputs.oidcIssuerUrl}': 'system:serviceaccount:flux-system:source-controller'
       '${aks.outputs.oidcIssuerUrl}': 'system:serviceaccount:flux-system:helm-controller'
       '${aks.outputs.oidcIssuerUrl}': 'system:serviceaccount:flux-system:image-reflector-controller'
+      '${aks.outputs.oidcIssuerUrl}': 'system:serviceaccount:flux-system:kustomize-controller'
     }
   }
 }
