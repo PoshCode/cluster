@@ -77,16 +77,18 @@ $ErrorActionPreference = 'Stop'
 
 $repo = $GitRepositoryUri -replace ".*git@[^/]+/|.git$"
 
+# Flux will generate a key, and maybe register it for you?
 "y" |
 flux bootstrap git --url=$GitRepositoryUri --branch=main --path="clusters/$BaseName" `
---verbose --components-extra "image-reflector-controller,image-automation-controller" |
-    ForEach-Object {
-        $_
-        if ($_ -match "public key: (.*)") {
-            $Matches[1] > flux-key.pub
-            gh repo deploy-key add flux-key.pub --repo $repo --title "Flux Bootstrap"
-        }
-    }
+--verbose --components-extra "image-reflector-controller,image-automation-controller"
+
+# | ForEach-Object {
+#         $_
+#         if ($_ -match "public key: (.*)") {
+#             $Matches[1] > flux-key.pub
+#             gh repo deploy-key add flux-key.pub --repo $repo --title "Flux Bootstrap"
+#         }
+#     }
 
 #--private-key-file=$KeyFile `
 

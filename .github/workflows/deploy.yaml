@@ -45,14 +45,20 @@ jobs:
           parameters: adminId=${{ secrets.ADMIN_GROUP_ID }}
           deploymentName: ${{ steps.name.outputs.name }}
 
-      # - id: deploy-flux
-      #   shell: pwsh
-      #   run: |
-      #     $kustomize = Get-Content "clusters/poschode/flux/kustomization.ps1"
-      #     $kustomize = $kustomize -replace "azure.workload.identity/client-id: .*$", "azure.workload.identity/client-id: ${{ steps.deploy.outputs.fluxIdClientId }}"
-      #     # TODO: commit this file to the repo _before_ running flux
-      #     $kustomize | Set-Content "clusters/poschode/flux/kustomization.ps1"
-      #     ./infrastructure/Install-Flux.ps1
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - id: deploy-flux
+        shell: pwsh
+        run: |
+          #! Get the cluster credentials
+          Get-AzAksCluster -ResourceGroupName $Env:RESOURCE_GROUP |
+              Import-AzAksCredential -Force
+          #! Update the client ID from the deployment output
+          $kustomize = Get-Content "clusters/poschode/flux/kustomization.ps1"
+          $kustomize = $kustomize -replace "azure.workload.identity/client-id: .*$", "azure.workload.identity/client-id: ${{ steps.deploy.outputs.fluxIdClientId }}"
+          # TODO: commit this file to the repo _before_ running flux
+          $kustomize | Set-Content "clusters/poschode/flux/kustomization.ps1"
+          #! Bootstrap Flux
+          ./infrastructure/Install-Flux.ps1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RESOURCE_GROUP: ${{ secrets.AZURE_RG }}
 
