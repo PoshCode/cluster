@@ -4,6 +4,6 @@ metadata:
   name: traefik-forward-auth
 spec:
   forwardAuth:
-    address: httpd://auth.poshcode.com
+    address: https://auth.poshcode.com
     authResponseHeaders:
       - X-Forwarded-User
