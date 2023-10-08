@@ -6,7 +6,7 @@ metadata:
 spec:
   interval: 30m
   timeout: 5m
-  targetNamespace: ingress
+  targetNamespace: traefik
   chart:
     spec:
       chart: traefik-mesh

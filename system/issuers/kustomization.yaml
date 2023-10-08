@@ -1,3 +1,0 @@
-resources:
-  - letsencrypt-production.yaml
-  - letsencrypt-staging.yaml

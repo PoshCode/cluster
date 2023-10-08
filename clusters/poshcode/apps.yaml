@@ -8,7 +8,7 @@ spec:
   retryInterval: 10m
   timeout: 5m
   dependsOn:
-    - name: issuers
+    - name: config
   sourceRef:
     kind: GitRepository
     name: flux-system

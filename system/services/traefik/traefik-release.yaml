@@ -7,7 +7,7 @@ spec:
   interval: 30m
   timeout: 5m
   releaseName: traefik
-  targetNamespace: ingress
+  targetNamespace: traefik
   chart:
     spec:
       chart: traefik

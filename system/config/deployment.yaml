@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: traefik-forward-auth
+  namespace: traefik
 spec:
   minReadySeconds: 3
   replicas: 1
@@ -39,14 +40,14 @@ spec:
           valueFrom:
             secretKeyRef:
               name: azuread
-              key: random_secret
+              key: secret
         - name: DEFAULT_PROVIDER
           value: "oidc"
         - name: PROVIDERS_OIDC_ISSUER_URL
           valueFrom:
             secretKeyRef:
               name: azuread
-              key: endpoint
+              key: issuer_url
         - name: PROVIDERS_OIDC_CLIENT_ID
           valueFrom:
             secretKeyRef:

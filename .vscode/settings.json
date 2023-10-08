@@ -5,6 +5,7 @@
         "fluxcd",
         "Kustomization",
         "kustomize",
+        "letsencrypt",
         "podinfo",
         "poshcode",
         "traefik",

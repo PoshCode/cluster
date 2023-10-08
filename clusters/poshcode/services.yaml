@@ -13,8 +13,6 @@ spec:
     kind: GitRepository
     name: flux-system
   path: ./system/services
-  decryption:
-    provider: sops
   prune: true
   wait: true
   commonMetadata:
