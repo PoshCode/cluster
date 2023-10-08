@@ -5,7 +5,7 @@ metadata:
 spec:
   type: ClusterIP
   selector:
-    app: traefik
+    app: traefik-forward-auth
   ports:
   - name: http
     port: 4181
