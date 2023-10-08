@@ -5,7 +5,7 @@ metadata:
   namespace: podinfo
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-production
-    traefik.ingress.kubernetes.io/router.middlewares: secure-auth@kubernetescrd
+    traefik.ingress.kubernetes.io/router.middlewares: traefik-forward-auth@kubernetescrd
 spec:
   tls:
   - secretName: poshcode-tls

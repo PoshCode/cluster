@@ -8,7 +8,7 @@ metadata:
     # traefik.ingress.kubernetes.io/router.middlewares: traefik-auth@kubernetescrd
 spec:
   tls:
-  - secretName: auth-tls
+  - secretName: auth-poshcode-com-tls
     hosts:
     - auth.poshcode.com
   rules:
