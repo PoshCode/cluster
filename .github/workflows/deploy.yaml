@@ -42,7 +42,12 @@ jobs:
             #! Update the client ID from the deployment output
             $kustomize = Get-Content "./clusters/poshcode/flux-system/kustomization.yaml"
             $kustomize = $kustomize -replace "azure.workload.identity/client-id: .*$", "azure.workload.identity/client-id: $($Results.Outputs.fluxIdClientId)"
-            # TODO: commit this file to the repo _before_ running flux
             $kustomize | Set-Content "./clusters/poshcode/flux-system/kustomization.yaml"
+
+            git config --global user.name 'Workflow'
+            git config --global user.email 'jaykul@users.noreply.github.com'
+            git commit -am "Update Flux Client ID"
+            git push
+
             #! Bootstrap Flux
-            ./Initialize-Flux.ps1
+            # ./Initialize-Flux.ps1
