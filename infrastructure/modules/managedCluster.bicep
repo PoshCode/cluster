@@ -1,6 +1,9 @@
 @description('Required. The base for resource names')
 param baseName string
 
+@description('Optional. A dns prefix to put before .$location.cloudapp.azure.com')
+param dnsPrefix string = baseName
+
 @description('Optional. The location to deploy. Defaults to resourceGroup().location')
 param location string = resourceGroup().location
 
@@ -250,7 +253,7 @@ resource cluster 'Microsoft.ContainerService/managedClusters@2023-05-02-preview'
     // */
     // AAD enabled, no local accounts allowed
     disableLocalAccounts: false
-    dnsPrefix: baseName
+    dnsPrefix: dnsPrefix
     enablePodSecurityPolicy: false
     enableRBAC: true
     // For private clusters? Public clusters use dnsPrefix
