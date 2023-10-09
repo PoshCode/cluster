@@ -1,6 +1,6 @@
 <#
     .SYNOPSIS
-        Installs Flux v2 and bootstraps it to/from a git repository
+        Bootstraps Flux v2 to/from a git repository
     .DESCRIPTION
         The `flux bootstrap` command is idempotent, and besides installing (or upgrading) the controllers on the cluster,
         pushes the Flux manifests to the git repository, and configures Flux to update itself from Git.
@@ -59,17 +59,17 @@ param(
     # The passphrase for the SSH key file
     [SecureString]$KeyPassphrase = $global:KeyPassphrase
 )
-Push-Location $PSScriptRoot/.. -StackName InstallFlux
+Push-Location $PSScriptRoot -StackName InstallFlux
 
 # it's literally just a single file binary, but it comes in a zip/tar.gz so we'll just use the install script
-$version = if (Get-Command flux) {
+$version = if (Get-Command flux -ErrorAction Ignore) {
     (flux --version) -replace "flux version\s+"
 }
 
 if ($version -lt '2.1.1') {
     Write-Warning "Flux version 2.1.1 or higher not found. Please install and try again. Consider either ``choco install flux`` or ``brew install fluxcd/tap/flux``..."
     # In our workflows, we'll just install it ourselves:
-    if ($IsLinux -and $PSCmdlet.ShouldContinue("Install Flux?", "Install Flux?")) {
+    if ($IsLinux) {
         curl -s https://fluxcd.io/install.sh | sudo bash
     }
 }

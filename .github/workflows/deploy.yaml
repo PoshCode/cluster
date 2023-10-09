@@ -11,54 +11,38 @@ permissions:
 
 jobs:
   deploy-bicep:
-    runs-on: ubuntu-latest
     name: Deploy Bicep
+    runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v3
 
-      - uses: azure/login@v1
-        name: Login to Azure
+      - name: Login to Azure
+        uses: azure/login@v1
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           enable-AzPSSession: true
 
-      # Why on earth can't I just deploy the bicep file?
-      - uses: azure/bicep-build-action@v1.0.0
-        name: Bicep Build
-        with:
-          bicepFilePath: infrastructure/Cluster.bicep
-          outputFilePath: infrastructure/Cluster.json
-
-      - id: name
-        shell: pwsh
-        run: '"name=aks-$(Get-Date -f yyyyMMddThhmmss)" >> $Env:GITHUB_OUTPUT'
-
-      - uses: azure/arm-deploy@v1
-        name: deploy
-        timeout-minutes: 240
-        with:
-          template: infrastructure/Cluster.json
-          subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION }}
-          resourceGroupName: ${{ secrets.AZURE_RG }}
-          parameters: adminId=${{ secrets.ADMIN_GROUP_ID }}
-          deploymentName: ${{ steps.name.outputs.name }}
-
-      - id: deploy-flux
-        shell: pwsh
-        run: |
-          #! Get the cluster credentials
-          Get-AzAksCluster -ResourceGroupName $Env:RESOURCE_GROUP |
-              Import-AzAksCredential -Force
-          #! Update the client ID from the deployment output
-          $kustomize = Get-Content "clusters/poschode/flux/kustomization.ps1"
-          $kustomize = $kustomize -replace "azure.workload.identity/client-id: .*$", "azure.workload.identity/client-id: ${{ steps.deploy.outputs.fluxIdClientId }}"
-          # TODO: commit this file to the repo _before_ running flux
-          $kustomize | Set-Content "clusters/poschode/flux/kustomization.ps1"
-          #! Bootstrap Flux
-          ./infrastructure/Install-Flux.ps1
+      - name: Azure Resource Group Deployment
+        uses: azure/powershell@v1
         env:
+          SUBSCRIPTION: ${{ secrets.AZURE_SUBSCRIPTION }}
+          RESOURCEGROUP: ${{ secrets.AZURE_RG }}
+          ADMINS: ${{ secrets.ADMIN_GROUP_ID }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          RESOURCE_GROUP: ${{ secrets.AZURE_RG }}
-
+        with:
+          azPSVersion: "latest"
+          inlineScript: |
+            $Results = New-AzResourceGroupDeployment -Name "aks-$(Get-Date -f yyyyMMddThhmmss)" -ResourceGroupName $Env:RESOURCEGROUP -TemplateFile ./infrastructure/Cluster.bicep -TemplateParameterObject @{ adminId = $Env:ADMINS }
+            $Results | Out-Host
+            #! Get the cluster credentials
+            Get-AzAksCluster -ResourceGroupName $Env:RESOURCEGROUP | Import-AzAksCredential -Force
+            #! Update the client ID from the deployment output
+            $kustomize = Get-Content "./clusters/poshcode/flux-system/kustomization.yaml"
+            $kustomize = $kustomize -replace "azure.workload.identity/client-id: .*$", "azure.workload.identity/client-id: $($Results.Outputs.fluxIdClientId)"
+            # TODO: commit this file to the repo _before_ running flux
+            $kustomize | Set-Content "./clusters/poshcode/flux-system/kustomization.yaml"
+            #! Bootstrap Flux
+            ./Initialize-Flux.ps1
