@@ -236,13 +236,49 @@ module fluxId 'modules/userAssignedIdentity.bicep' = {
     baseName: 'flux'
     location: location
     tags: tags
-    federatedIdentitySubjectIssuerDictionary: {
-      'system:serviceaccount:flux-system:source-controller': aks.outputs.oidcIssuerUrl
-      'system:serviceaccount:flux-system:helm-controller': aks.outputs.oidcIssuerUrl
-      'system:serviceaccount:flux-system:image-reflector-controller': aks.outputs.oidcIssuerUrl
-      'system:serviceaccount:flux-system:kustomize-controller': aks.outputs.oidcIssuerUrl
-    }
   }
+}
+
+// UAI doesn't support multiple concurrent deployments, so create a dependency chain:
+module fluxSourceController 'modules/uaiFederatedIdentity.bicep' = {
+  name: '${deploymentName}_uai_fi_source'
+  params: {
+    subject: 'system:serviceaccount:flux-system:source-controller'
+    issuerUrl: aks.outputs.oidcIssuerUrl
+    name: 'flux-system-source-controller'
+    userAssignedIdentityName: fluxId.outputs.name
+  }
+  dependsOn: [fluxId]
+}
+module fluxHelmController 'modules/uaiFederatedIdentity.bicep' = {
+  name: '${deploymentName}_uai_fi_helm'
+  params: {
+    subject: 'system:serviceaccount:flux-system:helm-controller'
+    issuerUrl: aks.outputs.oidcIssuerUrl
+    name: 'flux-system-helm-controller'
+    userAssignedIdentityName: fluxId.outputs.name
+  }
+  dependsOn: [fluxSourceController]
+}
+module fluxImageController 'modules/uaiFederatedIdentity.bicep' = {
+  name: '${deploymentName}_uai_fi_image'
+  params: {
+    subject: 'system:serviceaccount:flux-system:image-reflector-controller'
+    issuerUrl: aks.outputs.oidcIssuerUrl
+    name: 'flux-system-image-reflector-controller'
+    userAssignedIdentityName: fluxId.outputs.name
+  }
+  dependsOn: [fluxHelmController]
+}
+module fluxKustomizeController 'modules/uaiFederatedIdentity.bicep' = {
+  name: '${deploymentName}_uai_fi_kust'
+  params: {
+    subject: 'system:serviceaccount:flux-system:kustomize-controller'
+    issuerUrl: aks.outputs.oidcIssuerUrl
+    name: 'flux-system-kustomize-controller'
+    userAssignedIdentityName: fluxId.outputs.name
+  }
+  dependsOn: [fluxImageController]
 }
 
 // // Managed Flux
