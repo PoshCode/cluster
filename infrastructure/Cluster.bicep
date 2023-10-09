@@ -236,11 +236,11 @@ module fluxId 'modules/userAssignedIdentity.bicep' = {
     baseName: 'flux'
     location: location
     tags: tags
-    azureADTokenExchangeFederatedIdentityCredentials: {
-      '${aks.outputs.oidcIssuerUrl}': 'system:serviceaccount:flux-system:source-controller'
-      '${aks.outputs.oidcIssuerUrl}': 'system:serviceaccount:flux-system:helm-controller'
-      '${aks.outputs.oidcIssuerUrl}': 'system:serviceaccount:flux-system:image-reflector-controller'
-      '${aks.outputs.oidcIssuerUrl}': 'system:serviceaccount:flux-system:kustomize-controller'
+    federatedIdentitySubjectIssuerDictionary: {
+      'system:serviceaccount:flux-system:source-controller': aks.outputs.oidcIssuerUrl
+      'system:serviceaccount:flux-system:helm-controller': aks.outputs.oidcIssuerUrl
+      'system:serviceaccount:flux-system:image-reflector-controller': aks.outputs.oidcIssuerUrl
+      'system:serviceaccount:flux-system:kustomize-controller': aks.outputs.oidcIssuerUrl
     }
   }
 }
