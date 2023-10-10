@@ -11,7 +11,7 @@ spec:
     - name: services
   sourceRef:
     kind: GitRepository
-    name: flux-system
+    name: bootstrap
   path: ./system/config
   decryption:
     provider: sops
