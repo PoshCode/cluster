@@ -154,10 +154,6 @@ process {
                     }
                     Add-Content $kustomization $Patch
                 }
-                if ($WorkloadIdentityContainers -contains "kustomize-controller") {
-                    $Patch = Get-Content (Join-Path clusters azure-auth-patch.yaml)
-                    Add-Content $kustomization $Patch
-                }
                 if ($OomWatch) {
                     $Patch = Get-Content (Join-Path clusters oom-watch-patch.yaml)
                     Add-Content $kustomization $Patch
