@@ -8,7 +8,7 @@ spec:
   ref:
     branch: main
   secretRef:
-    name: flux-system
+    name: bootstrap-protected-parameters
   url: ssh://git@github.com/PoshCode/cluster.git
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
