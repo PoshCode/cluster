@@ -1,0 +1,27 @@
+# Workload Identity. You must set the client-id and tenant-id
+- target:
+    kind: ServiceAccount
+    name: "(source-controller|helm-controller|image-reflector-controller|kustomize-controller)"
+  patch: |
+    apiVersion: v1
+    kind: ServiceAccount
+    metadata:
+      name: controller
+      annotations:
+        azure.workload.identity/client-id:
+        azure.workload.identity/tenant-id:
+- target:
+    kind: Deployment
+    name: "(source-controller|helm-controller|image-reflector-controller|kustomize-controller)"
+  patch: |
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: controller
+      labels:
+        azure.workload.identity/use: "true"
+    spec:
+      template:
+        metadata:
+          labels:
+            azure.workload.identity/use: "true"
