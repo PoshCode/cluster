@@ -98,6 +98,7 @@ process {
         # Always re-create the gotk-components.yaml file
         flux install --components-extra "image-reflector-controller,image-automation-controller" --export
         | Set-Content (Join-Path $FluxSystemPath gotk-components.yaml)
+        git add (Join-Path $FluxSystemPath gotk-components.yaml)
 
         # Apply the gotk-components file first (because it has CRDs)
         kubectl apply -f (Join-Path $FluxSystemPath gotk-components.yaml)
@@ -111,6 +112,7 @@ process {
             $Content = $Content -replace "url:.*", "url: $GitRepositoryUri"
             $Content = $Content -replace "path:.*", "path: clusters/$ClusterName"
             $Content | Set-Content $Bootstrap
+            git add $Bootstrap
         }
 
         # Only create the kustomization.yaml file if it doesn't exist
@@ -142,14 +144,15 @@ process {
                     Add-Content $kustomization $Patch
                 }
             }
+            git add $kustomization
         }
 
         # Commit the changes
         if ($BootStrapping) {
             git config --global user.name $AuthorName
             git config --global user.email $AuthorEmail
-            git commit -am "Bootstrap Flux v$version"
-            git switch -c "bootstrap-flux-v$version"
+            git switch -C "bootstrap-flux-v$version"
+            git commit -m "Bootstrap Flux v$version"
             git push
 
             Write-Warning "You need to create a pull request to merge the 'bootstrap-flux-v$version' branch into main."
