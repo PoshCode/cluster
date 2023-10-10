@@ -147,7 +147,7 @@ process {
                 Add-Content $kustomization "patches:"
                 if ($WorkloadIdentityContainers) {
                     $Patch = Get-Content (Join-Path clusters workload-identity-patch.yaml) -Raw
-                    $Patch = $Patch -replace "name: `"\(.*\)`"", "name: `"($WorkloadIdentityContainers -join '|')`""
+                    $Patch = $Patch -replace "name: `"\(.*\)`"", "name: `"($($WorkloadIdentityContainers -join '|'))`""
                     if ($TenantId -and $ClientId) {
                         $Patch = $Patch -replace "azure.workload.identity/client-id:.*", "azure.workload.identity/client-id: $ClientId"
                         $Patch = $Patch -replace "azure.workload.identity/tenant-id:.*", "azure.workload.identity/tenant-id: $TenantId"
