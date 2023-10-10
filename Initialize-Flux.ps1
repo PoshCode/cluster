@@ -115,6 +115,21 @@ process {
             git add $Bootstrap
         }
 
+        if ($BootStrapping) {
+            if ($Token) {
+                flux create secret git bootstrap-protected-parameters --url=$GitRepositoryUri --token=$(ConvertFrom-SecureString $Token -AsPlainText)
+            } else {
+                $publicKey = flux create secret git bootstrap-protected-parameters --url=$GitRepositoryUri
+                $publicKey = $publicKey -split "\n" -match "deploy key:" -replace ".*deploy key: "
+                if (Get-Command gh -ErrorAction SilentlyContinue) {
+                    $publicKey > deploy.pub
+                    gh repo deploy-key add deploy.pub -t "Flux v$version"
+                    Remove-Item deploy.pub
+                }
+                Write-Warning "You need to add this public key to your git repository as a deploy key: `n$publicKey"
+            }
+        }
+
         # Only create the kustomization.yaml file if it doesn't exist
         if (!(Test-Path ($kustomization = Join-Path $FluxSystemPath kustomization.yaml))) {
             $BootStrapping = $true
@@ -137,6 +152,10 @@ process {
                         $Patch = $Patch -replace "azure.workload.identity/client-id:.*", "azure.workload.identity/client-id: $ClientId"
                         $Patch = $Patch -replace "azure.workload.identity/tenant-id:.*", "azure.workload.identity/tenant-id: $TenantId"
                     }
+                    Add-Content $kustomization $Patch
+                }
+                if ($WorkloadIdentityContainers -contains "kustomize-controller") {
+                    $Patch = Get-Content (Join-Path clusters azure-auth-patch.yaml)
                     Add-Content $kustomization $Patch
                 }
                 if ($OomWatch) {
