@@ -11,10 +11,11 @@ resources:
 - letsencrypt-production.yaml
 - letsencrypt-staging.yaml
 
-# #
-# # Configs
-# #
-# configMapGenerator:
-# - name: configs
-#   files:
-#     - configs/traefik-forward-auth.ini
+#
+# Configs
+#
+configMapGenerator:
+- name: configs
+  namespace: traefik
+  files:
+    - middleware/forward-auth.ini

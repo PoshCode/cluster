@@ -58,18 +58,17 @@ spec:
             secretKeyRef:
               name: azuread
               key: client_secret
-        # - name: CONFIG
-        #   value: "/config"
+        - name: CONFIG
+          value: "/config/forward-auth.ini"
         resources:
           limits:
             memory: "256Mi"
             cpu: "200m"
-      #   volumeMounts:
-      #   - name: configs
-      #     mountPath: /config
-      #     subPath: traefik-forward-auth.ini
-      # volumes:
-      # - name: configs
-      #   configMap:
-      #     name: configs
+        volumeMounts:
+        - name: configs
+          mountPath: /config
+      volumes:
+      - name: configs
+        configMap:
+          name: configs
 
