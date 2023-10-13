@@ -1,0 +1,13 @@
+resources:
+  - namespace.yaml
+  - repository.yaml
+  - release.yaml
+
+configMapGenerator:
+  - name: prometheus-values
+    namespace: flux-system
+    files:
+      - values.yaml=kube-prometheus-stack-51.6.1-values.yaml
+
+configurations:
+  - valuesfrom.yaml
