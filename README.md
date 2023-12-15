@@ -9,7 +9,7 @@ There are two parts:
 
 ## Infrastructure Deployment
 
-I've written my own template for deploying AKS, and it's in the `Infrastructure` folder. It's written in [Azure Bicep](https://docs.microsoft.com/en-us/azure/azure-resource-manager/bicep/overview), and is relatively opinionated, since we're using Flux for GitOps.
+I've written my own template for deploying AKS, and it's in the `Infrastructure` folder. It's written in [Azure Bicep](https://docs.microsoft.com/en-us/azure/azure-resource-manager/bicep/overview), and is relatively opinionated. You may want to use the [AKS Constructruction](https://azure.github.io/AKS-Construction/) or [Azure Quickstart Templates](https://learn.microsoft.com/en-us/samples/azure/azure-quickstart-templates/aks/) instead.
 
 ### Prerequisites
 
@@ -48,6 +48,11 @@ New-AzResourceGroupDeployment @Deployment
 
 One thing to note is that because this is currently a _public_ repository, there's no need to configure a PAT token or anything for Flux to be able to access it.
 
-The current configuration is using the [Microsoft.Flux](https://learn.microsoft.com/en-us/azure/azure-arc/kubernetes/conceptual-gitops-flux2#flux-cluster-extension) AKS cluster extension to install and configure flux from the bicep ARM template.
+The current configuration is using the [Microsoft.Flux](https://learn.microsoft.com/en-us/azure/azure-arc/kubernetes/conceptual-gitops-flux2#flux-cluster-extension) AKS cluster extension to install and configure flux directly from the bicep ARM template.
 
-However, Microsoft's Flux is lagging behind, and they still have not provided a way to deploy it using [Workload Identity](https://fluxcd.io/flux/installation/configuration/workload-identity/#azure-workload-identity), so the benefit of having Flux managed for us is not really there. I'm considering adding a workflow step to run `flux bootstrap` and taking over upgrading flux.
+Of course, if you want to install flux by hand on an existing cluster, it can be as simple as:
+
+```PowerShell
+flux bootstrap github --owner PoshCode --repository cluster --path=clusters/poshcode
+```
+

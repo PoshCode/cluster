@@ -1,0 +1,14 @@
+resources:
+  - namespace.yaml
+  - repository.yaml
+  - release.yaml
+  - secret.yaml
+
+configMapGenerator:
+  - name: dex-values
+    namespace: flux-system
+    files:
+      - values.yaml=dex-0.15.3-values.yaml
+
+configurations:
+  - valuesfrom.yaml

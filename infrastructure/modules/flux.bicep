@@ -4,9 +4,36 @@ param baseName string
 @description('Required. The url of the gitOps repository.')
 param gitOpsRepositoryUrl string
 
+@description('Optional. The ClientId of a user assigned identity to use for flux.')
+param identityClientId string = ''
+
+param enableNotifications bool = false
+param enableImageAutomation bool = false
+
 resource cluster 'Microsoft.ContainerService/managedClusters@2023-05-02-preview' existing = {
   name: 'aks-${baseName}'
 }
+
+var configuration = union(
+  {
+      // https://fluxcd.io/flux/components/
+    'source-controller.enabled': 'true'
+    'kustomize-controller.enabled': 'true'
+    'helm-controller.enabled': 'true'
+  },
+  identityClientId != '' ? {
+    'workloadIdentity.enable': 'true'
+    'workloadIdentity.azureClientId': identityClientId
+  } : {},
+  enableNotifications ? {
+      // https://fluxcd.io/flux/components/notification/ can generate events for source changes
+      'notification-controller.enabled': 'true'
+  }: {},
+  enableImageAutomation ? {
+      // https://fluxcd.io/flux/components/image/ can update the Git repository when new container images are available
+      'image-automation-controller.enabled': 'true'
+      'image-reflector-controller.enabled': 'true'
+  } : {})
 
 // Supposedly, the extension will be installed automatically when you create the first
 // Microsoft.KubernetesConfiguration/fluxConfigurations in a cluster
@@ -23,18 +50,8 @@ resource flux 'Microsoft.KubernetesConfiguration/extensions@2023-05-01' = {
         releaseNamespace: 'flux-system'
       }
     }
-    /*  *** If we want to deploy the image reflector and image automation (instead of relying on helm) ***
-    configurationSettings: {
-      // https://fluxcd.io/flux/components/
-      'source-controller.enabled': 'true'
-      'kustomize-controller.enabled': 'true'
-      'helm-controller.enabled': 'true'
-      // https://fluxcd.io/flux/components/notification/ can generate events for source changes
-      'notification-controller.enabled': 'true'
-      // https://fluxcd.io/flux/components/image/ can update the Git repository when new container images are available
-      'image-automation-controller.enabled': 'true'
-      'image-reflector-controller.enabled': 'true'
-    } // */
+    //*  *** If we want to deploy the image reflector and image automation (instead of relying on helm) ***
+    configurationSettings: configuration // */
   }
   // NOTE: Microsoft.KubernetesConfiguration/extensions MUST BE SEQUENTIAL
   // SEE: https://github.com/Azure/AKS-Construction/issues/385
