@@ -6,7 +6,7 @@ resources:
 - deployment.yaml
 - service.yaml
 - ingress.yaml
-- secret.yaml
+- secret-dex.yaml # this one worked: secret-azuread.yaml
 - middleware/forward-auth.yaml
 - letsencrypt-production.yaml
 - letsencrypt-staging.yaml

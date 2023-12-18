@@ -3,7 +3,7 @@
 # Declare variables to be passed into your templates.
 
 # -- Number of replicas (pods) to launch.
-replicaCount: 1
+replicaCount: 2
 
 # -- Labels to apply to all resources and selectors.
 commonLabels: {}
@@ -55,7 +55,7 @@ configSecret:
 # See the [official documentation](https://dexidp.io/docs/).
 config:
   # Set it to a valid URL
-  issuer: https://dex.poshcode.com
+  issuer: https://dex.poshcode.com/
 
   # See https://dexidp.io/docs/storage/ for more options
   storage:
@@ -68,7 +68,7 @@ config:
     id: forward-auth
     secret: $FORWARD_AUTH_SECRET
     redirectURIs:
-    - https://auth.poshcode.com
+    - https://auth.poshcode.com/_oauth
 
   connectors:
   - type: github
@@ -238,9 +238,9 @@ ingress:
   # -- Ingress TLS configuration.
   # @default -- See [values.yaml](values.yaml).
   tls:
-    - hosts:
-      - dex.poshcode.com
-      secretName: dex-poshcode-com-tls
+  - secretName: dex-poshcode-com-tls
+    hosts:
+    - dex.poshcode.com
 
 serviceMonitor:
   # -- Enable Prometheus ServiceMonitor.
