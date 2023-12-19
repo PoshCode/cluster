@@ -12,7 +12,7 @@ configMapGenerator:
   - name: traefik-values
     namespace: flux-system
     files:
-      - values.yaml=traefik-24.0.0-values.yaml
+      - values.yaml=traefik-26.0.0-values.yaml
 
 configurations:
   - valuesfrom.yaml
