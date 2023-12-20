@@ -15,7 +15,8 @@ spec:
   path: ./apps
   prune: true
   wait: true
-
+  decryption:
+    provider: sops
   commonMetadata:
     annotations:
       poshcode.org/tenant: sre-team
