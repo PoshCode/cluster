@@ -7,7 +7,7 @@ configMapGenerator:
   - name: prometheus-values
     namespace: flux-system
     files:
-      - values.yaml=kube-prometheus-stack-51.6.1-values.yaml
+      - values.yaml=kube-prometheus-stack-56.21.1-values.yaml
 
 configurations:
   - valuesfrom.yaml
