@@ -11,7 +11,7 @@ configMapGenerator:
   - name: dex-values
     namespace: flux-system
     files:
-      - values.yaml=dex-0.15.3-values.yaml
+      - values.yaml=dex-0.16.0-values.yaml
 
 configurations:
   - valuesfrom.yaml
