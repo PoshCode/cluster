@@ -106,10 +106,9 @@ param additionalNodePoolProfiles array = []
 
 @description('''
 Optional. The base version of Kubernetes to use. Node pools are set to auto patch, so they only use the 'major.minor' part.
-Defaults to 1.27
+Defaults to 1.28
 ''')
-param kubernetesVersion string = '1.27'
-
+param kubernetesVersion string = '1.28'
 
 @description('''Optional. Controls automatic upgrades:
 - none. No automatic patching
