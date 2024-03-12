@@ -1,18 +1,13 @@
 resources:
   - namespace.yaml
   - repository.yaml
-  - traefik-release.yaml
-  #- mesh-release.yaml
+  - release.yaml
 
 configMapGenerator:
-  - name: mesh-values
-    namespace: flux-system
-    files:
-      - values.yaml=traefik-mesh-4.1.1-values.yaml
   - name: traefik-values
     namespace: flux-system
     files:
-      - values.yaml=traefik-26.1.0-values.yaml
+      - values.yaml=traefik-values.yaml
 
 configurations:
   - valuesfrom.yaml
