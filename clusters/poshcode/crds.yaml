@@ -10,7 +10,7 @@ spec:
   sourceRef:
     kind: GitRepository
     name: bootstrap
-  path: ./system/crds
+  path: ./crds
   prune: true
   wait: true
   commonMetadata:

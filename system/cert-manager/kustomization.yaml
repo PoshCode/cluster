@@ -2,12 +2,14 @@ resources:
   - namespace.yaml
   - repository.yaml
   - release.yaml
+  - clusterissuer-letsencrypt-production.yaml
+  - clusterissuer-letsencrypt-staging.yaml
 
 configMapGenerator:
   - name: cert-manager-values
     namespace: flux-system
     files:
-      - values.yaml=cert-manager-v1.14.3-values.yaml
+      - values.yaml=cert-manager-values.yaml
 
 configurations:
   - valuesfrom.yaml

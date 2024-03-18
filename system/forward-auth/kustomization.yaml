@@ -3,13 +3,11 @@ kind: Kustomization
 
 resources:
 - namespace.yaml
+- middleware.yaml
 - deployment.yaml
-- service.yaml
 - ingress.yaml
+- service.yaml
 - secret-dex.yaml # this one worked: secret-azuread.yaml
-- middleware/forward-auth.yaml
-- letsencrypt-production.yaml
-- letsencrypt-staging.yaml
 
 #
 # Configs
@@ -18,4 +16,4 @@ configMapGenerator:
 - name: configs
   namespace: traefik
   files:
-    - middleware/forward-auth.ini
+    - rules.ini
