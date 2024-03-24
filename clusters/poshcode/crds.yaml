@@ -9,7 +9,7 @@ spec:
   timeout: 5m
   sourceRef:
     kind: GitRepository
-    name: bootstrap
+    name: poshcode
   path: ./crds
   prune: true
   wait: true
