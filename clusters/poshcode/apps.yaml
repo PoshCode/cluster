@@ -8,7 +8,7 @@ spec:
   retryInterval: 10m
   timeout: 5m
   dependsOn:
-    - name: system
+    - name: services
   sourceRef:
     kind: GitRepository
     name: poshcode
