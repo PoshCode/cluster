@@ -10,7 +10,7 @@ spec:
   sourceRef:
     kind: GitRepository
     name: poshcode
-  path: ./crds
+  path: ./system/crds
   prune: true
   wait: true
   commonMetadata:

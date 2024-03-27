@@ -12,7 +12,7 @@ spec:
   sourceRef:
     kind: GitRepository
     name: poshcode
-  path: ./system
+  path: ./system/services
   decryption:
     provider: sops
   prune: true
