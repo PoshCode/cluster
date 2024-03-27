@@ -1,2 +1,8 @@
 resources:
   - cert-manager-v1.14.3.crds.yaml
+  - gateway-networking-v1.0.0-gatewayclasses.yaml
+  - gateway-networking-v1.0.0-gateways.yaml
+  - gateway-networking-v1.0.0-httproutes.yaml
+  - gateway-networking-v1.0.0-referencegrants.yaml
+  - gateway-networking-v1.0.0-grpcroutes.yaml
+  - gateway-networking-v1.0.0-tlsroutes.yaml
