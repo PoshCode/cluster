@@ -22,6 +22,12 @@ spec:
         #  subscriptionID: 2d5bb2c8-8be8-4539-b48f-fbfd86852fa9
         #  resourceGroupName: domainssl
         #  hostedZoneName: azdemo.co.uk
+    # - http01:
+    #     ingress:
+    #         class: traefik
     - http01:
-        ingress:
-            class: traefik
+        gatewayHTTPRoute:
+          parentRefs:
+          - name: gateway
+            namespace: cillium
+            kind: Gateway
