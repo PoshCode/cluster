@@ -6,6 +6,7 @@ resources:
   - repository.yaml
   - release.yaml
   - secret.yaml
+  - routes.yaml
 
 configMapGenerator:
   - name: dex-values

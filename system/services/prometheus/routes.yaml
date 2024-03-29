@@ -1,0 +1,59 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  namespace: monitoring
+  name: kube-prometheus-stack-grafana
+spec:
+  hostnames:
+  - grafana.poshcode.com
+  parentRefs:
+  - name: gateway
+    namespace: cillium
+  rules:
+  - backendRefs:
+    - name: kube-prometheus-stack-grafana
+      port: 80
+    matches:
+    - path:
+        type: PathPrefix
+        value: /
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  namespace: monitoring
+  name: kube-prometheus-stack-prometheus-prometheus-poshcode-com
+spec:
+  hostnames:
+  - prometheus.poshcode.com
+  parentRefs:
+  - name: gateway
+    namespace: cillium
+  rules:
+  - backendRefs:
+    - name: kube-prometheus-stack-prometheus
+      port: 9090
+    matches:
+    - path:
+        type: PathPrefix
+        value: /
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  namespace: monitoring
+  name: kube-prometheus-stack-alertmanager-alerts-poshcode-com
+spec:
+  hostnames:
+  - alerts.poshcode.com
+  parentRefs:
+  - name: gateway
+    namespace: cillium
+  rules:
+  - backendRefs:
+    - name: kube-prometheus-stack-alertmanager
+      port: 9093
+    matches:
+    - path:
+        type: PathPrefix
+        value: /

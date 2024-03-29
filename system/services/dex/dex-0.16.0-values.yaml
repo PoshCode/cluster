@@ -215,7 +215,7 @@ service:
 
 ingress:
   # -- Enable [ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/).
-  enabled: true
+  enabled: false
 
   # -- Ingress [class name](https://kubernetes.io/docs/concepts/services-networking/ingress/#ingress-class).
   className: traefik
