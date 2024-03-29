@@ -7,8 +7,11 @@ spec:
   hostnames:
   - grafana.poshcode.com
   parentRefs:
-  - name: gateway
+  - group: gateway.networking.k8s.io
+    kind: Gateway
     namespace: cillium
+    name: gateway
+    sectionName: https-grafana
   rules:
   - backendRefs:
     - name: kube-prometheus-stack-grafana
@@ -27,8 +30,11 @@ spec:
   hostnames:
   - prometheus.poshcode.com
   parentRefs:
-  - name: gateway
+  - group: gateway.networking.k8s.io
+    kind: Gateway
     namespace: cillium
+    name: gateway
+    sectionName: https-prometheus
   rules:
   - backendRefs:
     - name: kube-prometheus-stack-prometheus
@@ -47,8 +53,11 @@ spec:
   hostnames:
   - alerts.poshcode.com
   parentRefs:
-  - name: gateway
+  - group: gateway.networking.k8s.io
+    kind: Gateway
     namespace: cillium
+    name: gateway
+    sectionName: https-alerts
   rules:
   - backendRefs:
     - name: kube-prometheus-stack-alertmanager

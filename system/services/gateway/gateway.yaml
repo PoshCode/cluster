@@ -19,7 +19,7 @@ spec:
           matchExpressions:
             - key: poshcode.com/http-allowed
               operator: "true"
-  - name: https-1
+  - name: https-poshcode
     allowedRoutes:
       namespaces:
         from: All
@@ -31,3 +31,51 @@ spec:
       certificateRefs:
       - kind: Secret
         name: poshcode-tls
+  - name: https-grafana
+    allowedRoutes:
+      namespaces:
+        from: All
+    protocol: HTTPS
+    port: 443
+    hostname: grafana.poshcode.com
+    tls:
+      mode: Terminate
+      certificateRefs:
+      - kind: Secret
+        name: grafana-poshcode-tls
+  - name: https-prometheus
+    allowedRoutes:
+      namespaces:
+        from: All
+    protocol: HTTPS
+    port: 443
+    hostname: prometheus.poshcode.com
+    tls:
+      mode: Terminate
+      certificateRefs:
+      - kind: Secret
+        name: prometheus-poshcode-tls
+  - name: https-alerts
+    allowedRoutes:
+      namespaces:
+        from: All
+    protocol: HTTPS
+    port: 443
+    hostname: alerts.poshcode.com
+    tls:
+      mode: Terminate
+      certificateRefs:
+      - kind: Secret
+        name: alerts-poshcode-tls
+  - name: https-dex
+    allowedRoutes:
+      namespaces:
+        from: All
+    protocol: HTTPS
+    port: 443
+    hostname: dex.poshcode.com
+    tls:
+      mode: Terminate
+      certificateRefs:
+      - kind: Secret
+        name: dex-poshcode-tls

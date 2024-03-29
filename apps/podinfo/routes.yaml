@@ -6,8 +6,11 @@ spec:
   hostnames:
   - poshcode.com
   parentRefs:
-  - name: gateway
+  - group: gateway.networking.k8s.io
+    kind: Gateway
     namespace: cillium
+    name: gateway
+    sectionName: https-poshcode
   rules:
   - backendRefs:
     - name: podinfo
