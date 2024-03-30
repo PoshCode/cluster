@@ -9,7 +9,7 @@ spec:
   parentRefs:
   - group: gateway.networking.k8s.io
     kind: Gateway
-    namespace: cilium
+    namespace: networking
     name: damascus
     sectionName: https-grafana
   rules:
@@ -32,7 +32,7 @@ spec:
   parentRefs:
   - group: gateway.networking.k8s.io
     kind: Gateway
-    namespace: cilium
+    namespace: networking
     name: damascus
     sectionName: https-prometheus
   rules:
@@ -55,7 +55,7 @@ spec:
   parentRefs:
   - group: gateway.networking.k8s.io
     kind: Gateway
-    namespace: cilium
+    namespace: networking
     name: damascus
     sectionName: https-alerts
   rules:

@@ -6,7 +6,7 @@ spec:
   hostnames:
   - poshcode.com
   parentRefs:
-  - namespace: cilium
+  - namespace: networking
     name: damascus
     sectionName: https-poshcode
   rules:

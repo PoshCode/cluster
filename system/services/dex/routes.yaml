@@ -7,7 +7,7 @@ spec:
   hostnames:
   - dex.poshcode.com
   parentRefs:
-  - namespace: cilium
+  - namespace: networking
     name: damascus
     sectionName: https-dex
   rules:
