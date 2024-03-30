@@ -10,9 +10,9 @@ spec:
   infrastructure:
     annotations:
       service.beta.kubernetes.io/azure-dns-label-name: poshcode
-  addresses:
-    - type: Hostname
-      value: poshcode
+  # addresses:
+  #   - type: Hostname
+  #     value: poshcode
   listeners:
   - name: http-1
     protocol: HTTP
