@@ -27,6 +27,6 @@ spec:
     - http01:
         gatewayHTTPRoute:
           parentRefs:
-          - name: gateway
+          - name: damascus
             namespace: cilium
             kind: Gateway

@@ -10,7 +10,7 @@ spec:
   - group: gateway.networking.k8s.io
     kind: Gateway
     namespace: cilium
-    name: gateway
+    name: damascus
     sectionName: https-grafana
   rules:
   - backendRefs:
@@ -33,7 +33,7 @@ spec:
   - group: gateway.networking.k8s.io
     kind: Gateway
     namespace: cilium
-    name: gateway
+    name: damascus
     sectionName: https-prometheus
   rules:
   - backendRefs:
@@ -56,7 +56,7 @@ spec:
   - group: gateway.networking.k8s.io
     kind: Gateway
     namespace: cilium
-    name: gateway
+    name: damascus
     sectionName: https-alerts
   rules:
   - backendRefs:

@@ -6,10 +6,8 @@ spec:
   hostnames:
   - poshcode.com
   parentRefs:
-  - group: gateway.networking.k8s.io
-    kind: Gateway
-    namespace: cilium
-    name: gateway
+  - namespace: cilium
+    name: damascus
     sectionName: https-poshcode
   rules:
   - backendRefs:
