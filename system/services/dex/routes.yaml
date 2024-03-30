@@ -7,9 +7,7 @@ spec:
   hostnames:
   - dex.poshcode.com
   parentRefs:
-  - group: gateway.networking.k8s.io
-    kind: Gateway
-    namespace: cillium
+  - namespace: cilium
     name: gateway
     sectionName: https-dex
   rules:

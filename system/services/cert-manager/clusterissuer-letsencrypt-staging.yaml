@@ -28,5 +28,5 @@ spec:
         gatewayHTTPRoute:
           parentRefs:
           - name: gateway
-            namespace: cillium
+            namespace: cilium
             kind: Gateway
