@@ -3,6 +3,7 @@ resources:
   - repository.yaml
   - release.yaml
   - routes.yaml
+  - secret.yaml
 
 configMapGenerator:
   - name: prometheus-values

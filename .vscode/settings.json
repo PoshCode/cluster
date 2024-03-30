@@ -6,6 +6,7 @@
         "Kustomization",
         "kustomize",
         "letsencrypt",
+        "oidc",
         "podinfo",
         "poshcode",
         "traefik",

@@ -55,7 +55,7 @@ configSecret:
 # See the [official documentation](https://dexidp.io/docs/).
 config:
   # Set it to a valid URL
-  issuer: https://dex.poshcode.com/
+  issuer: https://dex.poshcode.com
 
   # See https://dexidp.io/docs/storage/ for more options
   storage:
@@ -64,11 +64,13 @@ config:
       inCluster: true
 
   staticClients:
-  - name: Forward Auth
-    id: forward-auth
-    secret: $FORWARD_AUTH_SECRET
+  # One of these: https://oauth2-proxy.github.io/oauth2-proxy/configuration/overview
+  - name: OAuth2 Proxy For Kube Prometheus Stack
+    id: oauth2-proxy-kube-prometheus-stack
+    secret: $OAUTH2_PROXY_AUTH_SECRET
     redirectURIs:
-    - https://auth.poshcode.com/_oauth
+    - https://prometheus.poshcode.com/oauth2/callback
+    - https://alerts.poshcode.com/oauth2/callback
 
   connectors:
   - type: github
@@ -110,10 +112,10 @@ envVars:
     secretKeyRef:
       name: github-client
       key: client-secret
-- name: FORWARD_AUTH_SECRET
+- name: OAUTH2_PROXY_AUTH_SECRET
   valueFrom:
     secretKeyRef:
-      name: forward-auth
+      name: oauth2-proxy-kube-prometheus-stack
       key: client-secret
 
 serviceAccount:

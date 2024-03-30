@@ -500,13 +500,13 @@ alertmanager:
 
     ## Additional ports to open for Alertmanager service
     ##
-    additionalPorts: []
-    # - name: oauth-proxy
-    #   port: 8081
-    #   targetPort: 8081
-    # - name: oauth-metrics
-    #   port: 8082
-    #   targetPort: 8082
+    additionalPorts:
+    - name: oauth-proxy
+      port: 8081
+      targetPort: 8081
+    - name: oauth-metrics
+      port: 8082
+      targetPort: 8082
 
     externalIPs: []
     loadBalancerIP: ""
@@ -635,9 +635,9 @@ alertmanager:
 
     ## Additional Endpoints
     ##
-    additionalEndpoints: []
-    # - port: oauth-metrics
-    #   path: /metrics
+    additionalEndpoints:
+    - port: oauth-metrics
+      path: /metrics
 
   ## Settings affecting alertmanagerSpec
   ## ref: https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#alertmanagerspec
@@ -862,23 +862,39 @@ alertmanager:
 
     ## Containers allows injecting additional containers. This is meant to allow adding an authentication proxy to an Alertmanager pod.
     ##
-    containers: []
-    # containers:
-    # - name: oauth-proxy
-    #   image: quay.io/oauth2-proxy/oauth2-proxy:v7.5.1
-    #   args:
-    #   - --upstream=http://127.0.0.1:9093
-    #   - --http-address=0.0.0.0:8081
-    #   - --metrics-address=0.0.0.0:8082
-    #   - ...
-    #   ports:
-    #   - containerPort: 8081
-    #     name: oauth-proxy
-    #     protocol: TCP
-    #   - containerPort: 8082
-    #     name: oauth-metrics
-    #     protocol: TCP
-    #   resources: {}
+    containers:
+    - name: oauth-proxy
+      image: quay.io/oauth2-proxy/oauth2-proxy:v7.6.0
+      args:
+      - --upstream=http://127.0.0.1:9093
+      - --http-address=0.0.0.0:8081
+      - --metrics-address=0.0.0.0:8082
+      - --provider=oidc
+      - --oidc-issuer-url=https://dex.poshcode.com
+      - --code-challenge-method=S256
+      - --scope=openid profile email
+      - --email-domain=*
+      env:
+      - name: OAUTH2_PROXY_CLIENT_ID
+        value: oauth2-proxy-kube-prometheus-stack
+      - name: OAUTH2_PROXY_CLIENT_SECRET
+        valueFrom:
+          secretKeyRef:
+            name: oauth2-proxy
+            key: client-secret
+      - name: OAUTH2_PROXY_COOKIE_SECRET
+        valueFrom:
+          secretKeyRef:
+            name: oauth2-proxy
+            key: cookie-secret
+      ports:
+      - containerPort: 8081
+        name: oauth-proxy
+        protocol: TCP
+      - containerPort: 8082
+        name: oauth-metrics
+        protocol: TCP
+      resources: {}
 
     # Additional volumes on the output StatefulSet definition.
     volumes: []
@@ -3023,14 +3039,13 @@ prometheus:
 
     ## Additional ports to open for Prometheus service
     ##
-    additionalPorts: []
-    # additionalPorts:
-    # - name: oauth-proxy
-    #   port: 8081
-    #   targetPort: 8081
-    # - name: oauth-metrics
-    #   port: 8082
-    #   targetPort: 8082
+    additionalPorts:
+    - name: oauth-proxy
+      port: 8081
+      targetPort: 8081
+    - name: oauth-metrics
+      port: 8082
+      targetPort: 8082
 
     ## Consider that all endpoints are considered "ready" even if the Pods themselves are not
     ## Ref: https://kubernetes.io/docs/reference/kubernetes-api/service-resources/service-v1/#ServiceSpec
@@ -3292,9 +3307,9 @@ prometheus:
 
     ## Additional Endpoints
     ##
-    additionalEndpoints: []
-    # - port: oauth-metrics
-    #   path: /metrics
+    additionalEndpoints:
+    - port: oauth-metrics
+      path: /metrics
 
   ## Settings affecting prometheusSpec
   ## ref: https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#prometheusspec
@@ -3862,23 +3877,39 @@ prometheus:
 
     ## Containers allows injecting additional containers. This is meant to allow adding an authentication proxy to a Prometheus pod.
     ## if using proxy extraContainer update targetPort with proxy container port
-    containers: []
-    # containers:
-    # - name: oauth-proxy
-    #   image: quay.io/oauth2-proxy/oauth2-proxy:v7.5.1
-    #   args:
-    #   - --upstream=http://127.0.0.1:9090
-    #   - --http-address=0.0.0.0:8081
-    #   - --metrics-address=0.0.0.0:8082
-    #   - ...
-    #   ports:
-    #   - containerPort: 8081
-    #     name: oauth-proxy
-    #     protocol: TCP
-    #   - containerPort: 8082
-    #     name: oauth-metrics
-    #     protocol: TCP
-    #   resources: {}
+    containers:
+    - name: oauth-proxy
+      image: quay.io/oauth2-proxy/oauth2-proxy:v7.6.0
+      args:
+      - --upstream=http://127.0.0.1:9090
+      - --http-address=0.0.0.0:8081
+      - --metrics-address=0.0.0.0:8082
+      - --provider=oidc
+      - --oidc-issuer-url=https://dex.poshcode.com
+      - --code-challenge-method=S256
+      - --scope=openid profile email
+      - --email-domain=*
+      env:
+      - name: OAUTH2_PROXY_CLIENT_ID
+        value: oauth2-proxy-kube-prometheus-stack
+      - name: OAUTH2_PROXY_CLIENT_SECRET
+        valueFrom:
+          secretKeyRef:
+            name: oauth2-proxy
+            key: client-secret
+      - name: OAUTH2_PROXY_COOKIE_SECRET
+        valueFrom:
+          secretKeyRef:
+            name: oauth2-proxy
+            key: cookie-secret
+      ports:
+      - containerPort: 8081
+        name: oauth-proxy
+        protocol: TCP
+      - containerPort: 8082
+        name: oauth-metrics
+        protocol: TCP
+      resources: {}
 
     ## InitContainers allows injecting additional initContainers. This is meant to allow doing some changes
     ## (permissions, dir tree) on mounted volumes before starting prometheus
@@ -4330,9 +4361,9 @@ thanosRuler:
 
     ## Additional Endpoints
     ##
-    additionalEndpoints: []
-    # - port: oauth-metrics
-    #   path: /metrics
+    additionalEndpoints:
+    - port: oauth-metrics
+      path: /metrics
 
   ## Settings affecting thanosRulerpec
   ## ref: https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#thanosrulerspec
