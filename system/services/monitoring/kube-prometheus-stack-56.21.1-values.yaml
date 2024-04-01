@@ -3888,7 +3888,7 @@ prometheus:
       - --provider=oidc
       - --oidc-issuer-url=https://dex.poshcode.com
       - --redirect-url=https://prometheus.poshcode.com/oauth2/callback
-      - --code-challenge-method=S256
+      ## - --code-challenge-method=S256
       - --scope=openid profile email
       - --email-domain=*
       env:
