@@ -66,8 +66,8 @@ config:
   staticClients:
   # One of these: https://oauth2-proxy.github.io/oauth2-proxy/configuration/overview
   - name: OAuth2 Proxy For Kube Prometheus Stack
-    id: oauth2-proxy-kube-prometheus-stack
-    secret: $OAUTH2_PROXY_AUTH_SECRET
+    id: $OAUTH2_PROXY_CLIENT_ID
+    secret: $OAUTH2_PROXY_CLIENT_SECRET
     redirectURIs:
     - https://prometheus.poshcode.com/oauth2/callback
     - https://alerts.poshcode.com/oauth2/callback
@@ -112,10 +112,15 @@ envVars:
     secretKeyRef:
       name: github-client
       key: client-secret
-- name: OAUTH2_PROXY_AUTH_SECRET
+- name: OAUTH2_PROXY_CLIENT_ID
   valueFrom:
     secretKeyRef:
-      name: oauth2-proxy-kube-prometheus-stack
+      name: oauth2-proxy-prometheus-stack
+      key: client-id
+- name: OAUTH2_PROXY_CLIENT_SECRET
+  valueFrom:
+    secretKeyRef:
+      name: oauth2-proxy-prometheus-stack
       key: client-secret
 
 serviceAccount:
