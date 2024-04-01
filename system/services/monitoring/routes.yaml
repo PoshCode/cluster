@@ -38,7 +38,7 @@ spec:
   rules:
   - backendRefs:
     - name: kube-prometheus-stack-prometheus
-      port: 9090
+      port: 8080 # OAuth proxy to 9090
     matches:
     - path:
         type: PathPrefix
@@ -61,7 +61,7 @@ spec:
   rules:
   - backendRefs:
     - name: kube-prometheus-stack-alertmanager
-      port: 9093
+      port: 8083 # OAuth proxy to 9093
     matches:
     - path:
         type: PathPrefix
