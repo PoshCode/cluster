@@ -966,6 +966,30 @@ alertmanager:
 ##
 grafana:
   enabled: true
+
+  envFromSecret: grafana-env
+  grafana.ini:
+    check_for_updates: false
+    reporting_enabled: false
+    server:
+      domain: grafana.poshcode.com
+      enforce_domain: true
+      enable_gzip: true
+    security:
+      disable_gravatar: true
+    dashboards:
+      min_refresh_interval: 60s
+    auth.generic_oauth:
+      name: Dex
+      enabled: true
+      # client_id: $GF_AUTH_GENERIC_OAUTH_CLIENT_ID
+      # client_secret: $GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET
+      allow_sign_up: false
+      scopes: openid profile email groups
+      auth_url: http://dex.poshcode.com/auth
+      token_url: http://dex.poshcode.com/token
+      email_attribute_path: email
+
   namespaceOverride: ""
 
   ## ForceDeployDatasources Create datasource configmap even if grafana deployment has been disabled
@@ -3888,7 +3912,7 @@ prometheus:
       - --provider=oidc
       - --oidc-issuer-url=https://dex.poshcode.com
       - --redirect-url=https://prometheus.poshcode.com/oauth2/callback
-      ## - --code-challenge-method=S256
+      - --code-challenge-method=S256
       - --scope=openid profile email
       - --email-domain=*
       env:
