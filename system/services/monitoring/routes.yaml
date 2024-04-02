@@ -38,7 +38,7 @@ spec:
   rules:
   - backendRefs:
     - name: kube-prometheus-stack-prometheus
-      port: 8080 # OAuth proxy to 9090
+      port: 8081 # OAuth proxy to 9090
     matches:
     - path:
         type: PathPrefix
