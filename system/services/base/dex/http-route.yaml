@@ -4,8 +4,6 @@ metadata:
   name: dex
   namespace: dex
 spec:
-  hostnames:
-  - dex.poshcode.com
   parentRefs:
   - namespace: networking
     name: damascus

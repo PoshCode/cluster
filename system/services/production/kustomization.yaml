@@ -14,10 +14,6 @@ patches:
     target:
       kind: HelmRelease
       name: dex
-  - path: dex-route.yaml
-    target:
-      kind: HTTPRoute
-      name: dex
   - path: networking-gateway.yaml
     target:
       kind: Gateway
