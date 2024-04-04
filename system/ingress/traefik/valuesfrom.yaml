@@ -1,8 +1,0 @@
-# The built-in kustomize nameReference does not know about Flux's HelmRelease valuesFrom field.
-# https://github.com/kubernetes-sigs/kustomize/tree/master/examples/transformerconfigs#builtin-namereference
-nameReference:
-- kind: ConfigMap
-  version: v1
-  fieldSpecs:
-  - path: spec/valuesFrom/name
-    kind: HelmRelease
