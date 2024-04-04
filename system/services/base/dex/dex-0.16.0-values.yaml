@@ -3,7 +3,7 @@
 # Declare variables to be passed into your templates.
 
 # -- Number of replicas (pods) to launch.
-replicaCount: 2
+replicaCount: 1
 
 # -- Labels to apply to all resources and selectors.
 commonLabels: {}
@@ -17,7 +17,7 @@ image:
   pullPolicy: IfNotPresent
 
   # -- Image tag override for the default value (chart appVersion).
-  tag: latest-distroless
+  tag: ""
 
 # -- Reference to one or more secrets to be used when [pulling images](https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/#create-a-pod-that-uses-your-secret) (from private registries).
 imagePullSecrets: []
@@ -53,33 +53,7 @@ configSecret:
 
 # -- Application configuration.
 # See the [official documentation](https://dexidp.io/docs/).
-config:
-  # Set it to a valid URL
-  issuer: https://dex.poshcode.com/
-
-  # See https://dexidp.io/docs/storage/ for more options
-  storage:
-    type: kubernetes
-    config:
-      inCluster: true
-
-  staticClients:
-  - name: Forward Auth
-    id: forward-auth
-    secret: $FORWARD_AUTH_SECRET
-    redirectURIs:
-    - https://auth.poshcode.com/_oauth
-
-  connectors:
-  - type: github
-    id: github
-    name: GitHub
-    config:
-      clientID: $GITHUB_CLIENT_ID
-      clientSecret: $GITHUB_CLIENT_SECRET
-      redirectURI: https://dex.poshcode.com/callback
-      orgs:
-      - name: poshcode
+config: {}
 
 # -- Additional storage [volumes](https://kubernetes.io/docs/concepts/storage/volumes/).
 # See the [API reference](https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#volumes-1) for details.
@@ -99,22 +73,19 @@ env: {}
 
 # -- Similar to env but with support for all possible configurations.
 # See the [API reference](https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#environment-variables) for details.
-envVars:
-- name: GITHUB_CLIENT_ID
-  valueFrom:
-    secretKeyRef:
-      name: github-client
-      key: client-id
-- name: GITHUB_CLIENT_SECRET
-  valueFrom:
-    secretKeyRef:
-      name: github-client
-      key: client-secret
-- name: FORWARD_AUTH_SECRET
-  valueFrom:
-    secretKeyRef:
-      name: forward-auth
-      key: client-secret
+envVars: []
+# - name: SOME_ENV_VAR
+#   value: value
+# - name: SOME_ENV_VAR2
+#   valueFrom:
+#     secretKeyRef:
+#       name: secret-name
+#       key: secret-key
+# - name: SOME_ENV_VAR3
+#   valueFrom:
+#     configMapKeyRef:
+#       name: config-map-name
+#       key: config-map-key
 
 serviceAccount:
   # -- Enable service account creation.
@@ -212,35 +183,33 @@ service:
 
       # -- (int) gRPC node port (when applicable)
       nodePort:
+
 ingress:
   # -- Enable [ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/).
-  enabled: true
+  enabled: false
 
   # -- Ingress [class name](https://kubernetes.io/docs/concepts/services-networking/ingress/#ingress-class).
-  className: traefik
+  className: ""
 
   # -- Annotations to be added to the ingress.
-  annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-production
-
+  annotations: {}
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
 
   # -- Ingress host configuration.
   # @default -- See [values.yaml](values.yaml).
   hosts:
-    - host: dex.poshcode.com
+    - host: chart-example.local
       paths:
-      - path: /
-        pathType: ImplementationSpecific
-
+        - path: /
+          pathType: ImplementationSpecific
 
   # -- Ingress TLS configuration.
   # @default -- See [values.yaml](values.yaml).
-  tls:
-  - secretName: dex-poshcode-com-tls
-    hosts:
-    - dex.poshcode.com
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
 
 serviceMonitor:
   # -- Enable Prometheus ServiceMonitor.

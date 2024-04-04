@@ -1,0 +1,14 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: dex
+  namespace: flux-system
+spec:
+  chart:
+    spec:
+      version: "0.17.0"
+  values:
+    replicaCount: 2
+    configSecret:
+      create: false
+      name: dex-config

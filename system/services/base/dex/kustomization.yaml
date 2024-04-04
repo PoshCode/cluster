@@ -6,13 +6,13 @@ resources:
   - repository.yaml
   - release.yaml
   - secret.yaml
-  - routes.yaml
+  - http-route.yaml
 
 configMapGenerator:
   - name: dex-values
     namespace: flux-system
     files:
-      - values.yaml=dex-0.16.0-values.yaml
+      - values.yaml=dex-0.17.0-values.yaml
 
 configurations:
   - valuesfrom.yaml

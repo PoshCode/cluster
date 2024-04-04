@@ -9,7 +9,7 @@ configMapGenerator:
   - name: cert-manager-values
     namespace: flux-system
     files:
-      - values.yaml=cert-manager-values.yaml
+      - values.yaml=cert-manager-v1.14.4-values.yaml
 
 configurations:
   - valuesfrom.yaml

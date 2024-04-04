@@ -3,12 +3,10 @@ kind: HTTPRoute
 metadata:
   name: podinfo
 spec:
-  hostnames:
-  - poshcode.com
   parentRefs:
   - namespace: networking
     name: damascus
-    sectionName: https-poshcode
+    sectionName: https-tld
   rules:
   - backendRefs:
     - name: podinfo

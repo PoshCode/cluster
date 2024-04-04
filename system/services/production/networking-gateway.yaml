@@ -1,0 +1,15 @@
+- op: replace
+  path: /spec/listeners/1/hostname
+  value: poshcode.com
+- op: replace
+  path: /spec/listeners/2/hostname
+  value: dex.poshcode.com
+- op: replace
+  path: /spec/listeners/3/hostname
+  value: grafana.poshcode.com
+- op: replace
+  path: /spec/listeners/4/hostname
+  value: prometheus.poshcode.com
+- op: replace
+  path: /spec/listeners/5/hostname
+  value: alerts.poshcode.com

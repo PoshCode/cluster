@@ -20,7 +20,7 @@ spec:
     allowedRoutes:
       namespaces:
         from: All
-  - name: https-poshcode
+  - name: https-tld
     allowedRoutes:
       namespaces:
         from: All
@@ -31,7 +31,7 @@ spec:
       mode: Terminate
       certificateRefs:
       - kind: Secret
-        name: poshcode-tls
+        name: tld-tls
   - name: https-dex
     allowedRoutes:
       namespaces:
@@ -43,7 +43,7 @@ spec:
       mode: Terminate
       certificateRefs:
       - kind: Secret
-        name: dex-poshcode-tls
+        name: dex-tls
   - name: https-grafana
     allowedRoutes:
       namespaces:
@@ -55,7 +55,7 @@ spec:
       mode: Terminate
       certificateRefs:
       - kind: Secret
-        name: grafana-poshcode-tls
+        name: grafana-tls
   - name: https-prometheus
     allowedRoutes:
       namespaces:
@@ -67,7 +67,7 @@ spec:
       mode: Terminate
       certificateRefs:
       - kind: Secret
-        name: prometheus-poshcode-tls
+        name: prometheus-tls
   - name: https-alerts
     allowedRoutes:
       namespaces:
@@ -79,4 +79,4 @@ spec:
       mode: Terminate
       certificateRefs:
       - kind: Secret
-        name: alerts-poshcode-tls
+        name: alerts-tls
