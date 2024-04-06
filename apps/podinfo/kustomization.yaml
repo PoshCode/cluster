@@ -1,9 +1,0 @@
-namespace: podinfo
-
-resources:
-  - namespace.yaml
-  - deployment.yaml
-  - service.yaml
-# - ingress.yaml
-  - routes.yaml
-  - hpa.yaml

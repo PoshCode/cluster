@@ -1,0 +1,28 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: podinfo
+  namespace: podinfo
+spec:
+  chart:
+    spec:
+      version: "6.6.1"
+  values:
+    replicaCount: 2
+    serviceMonitor:
+      enabled: true
+    resources:
+      limits:
+        cpu: 10m
+        memory: 16Mi
+      requests:
+        cpu: 1m
+        memory: 16Mi
+    hpa:
+      enabled: true
+      maxReplicas: 5
+      requests: 100
+    ui:
+      color: "#34577c"
+      message: "Hello"
+      logo: ""
