@@ -983,7 +983,8 @@ grafana:
       enabled: true
       # client_id: $GF_AUTH_GENERIC_OAUTH_CLIENT_ID
       # client_secret: $GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET
-      allow_sign_up: false
+      allow_sign_up: true
+      auto_login: true
       scopes: openid profile email groups
       auth_url: https://dex.poshcode.com/auth
       token_url: https://dex.poshcode.com/token
