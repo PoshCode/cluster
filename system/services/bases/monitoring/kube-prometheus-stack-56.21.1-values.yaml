@@ -971,6 +971,7 @@ grafana:
   grafana.ini:
     server:
       domain: grafana.poshcode.com
+      root_url: https://grafana.poshcode.com
       enforce_domain: true
       enable_gzip: true
     security:
