@@ -969,8 +969,6 @@ grafana:
 
   envFromSecret: grafana-env
   grafana.ini:
-    check_for_updates: false
-    reporting_enabled: false
     server:
       domain: grafana.poshcode.com
       enforce_domain: true
@@ -988,6 +986,7 @@ grafana:
       scopes: openid profile email groups
       auth_url: http://dex.poshcode.com/auth
       token_url: http://dex.poshcode.com/token
+      api_url: http://dex.poshcode.com/userinfo
       email_attribute_path: email
 
   namespaceOverride: ""
