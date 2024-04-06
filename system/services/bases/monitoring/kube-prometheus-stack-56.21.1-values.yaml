@@ -881,12 +881,12 @@ alertmanager:
       - name: OAUTH2_PROXY_CLIENT_SECRET
         valueFrom:
           secretKeyRef:
-            name: oauth2-proxy
+            name: kube-prometheus-stack-prometheus-oauth2-proxy
             key: client-secret
       - name: OAUTH2_PROXY_COOKIE_SECRET
         valueFrom:
           secretKeyRef:
-            name: oauth2-proxy
+            name: kube-prometheus-stack-prometheus-oauth2-proxy
             key: cookie-secret
       ports:
       - containerPort: 8083
@@ -967,7 +967,7 @@ alertmanager:
 grafana:
   enabled: true
 
-  envFromSecret: grafana-env
+  envFromSecret: kube-prometheus-stack-grafana-env
   grafana.ini:
     server:
       domain: grafana.poshcode.com
@@ -984,12 +984,15 @@ grafana:
       # client_id: $GF_AUTH_GENERIC_OAUTH_CLIENT_ID
       # client_secret: $GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET
       allow_sign_up: true
-      auto_login: true
+      auto_login: false # if true, you go directly to dex
       scopes: openid profile email groups
       auth_url: https://dex.poshcode.com/auth
       token_url: https://dex.poshcode.com/token
       api_url: https://dex.poshcode.com/userinfo
       email_attribute_path: email
+      skip_org_role_sync: true
+      allow_assign_grafana_admin: true
+      auto_assign_org_role: Admin
 
   namespaceOverride: ""
 
@@ -1014,7 +1017,9 @@ grafana:
   ##
   defaultDashboardsEditable: true
 
-  adminPassword: prom-operator
+  adminPassword:
+  admin:
+    existingSecret: kube-prometheus-stack-grafana-admin
 
   rbac:
     ## If true, Grafana PSPs will be created
@@ -3922,12 +3927,12 @@ prometheus:
       - name: OAUTH2_PROXY_CLIENT_SECRET
         valueFrom:
           secretKeyRef:
-            name: oauth2-proxy
+            name: kube-prometheus-stack-prometheus-oauth2-proxy
             key: client-secret
       - name: OAUTH2_PROXY_COOKIE_SECRET
         valueFrom:
           secretKeyRef:
-            name: oauth2-proxy
+            name: kube-prometheus-stack-prometheus-oauth2-proxy
             key: cookie-secret
       ports:
       - containerPort: 8081
