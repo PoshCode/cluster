@@ -14,10 +14,10 @@ spec:
     resources:
       limits:
         cpu: 10m
-        memory: 16Mi
+        memory: 32Mi
       requests:
-        cpu: 1m
-        memory: 16Mi
+        cpu: 10m
+        memory: 32Mi
     hpa:
       enabled: true
       maxReplicas: 5
