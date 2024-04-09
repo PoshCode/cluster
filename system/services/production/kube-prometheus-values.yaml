@@ -12,7 +12,7 @@ namespaceOverride: "monitoring"
 
 ## Provide a k8s version to auto dashboard import script example: kubeTargetVersionOverride: 1.26.6
 ##
-kubeTargetVersionOverride: "1.27.9"
+kubeTargetVersionOverride: "1.28.5"
 
 ## Allow kubeVersion to be overridden while creating the ingress
 ##
@@ -31,7 +31,7 @@ commonLabels: {}
 ## Install Prometheus Operator CRDs
 ##
 crds:
-  enabled: true
+  enabled: false
 
 ## custom Rules to override "for" and "severity" in defaultRules
 ##
@@ -286,8 +286,6 @@ alertmanager:
 
   ## Configure pod disruption budgets for Alertmanager
   ## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/#specifying-a-poddisruptionbudget
-  ## This configuration is immutable once created and will require the PDB to be deleted to be changed
-  ## https://github.com/kubernetes/kubernetes/issues/45398
   ##
   podDisruptionBudget:
     enabled: false
@@ -389,7 +387,7 @@ alertmanager:
 
     # For Kubernetes >= 1.18 you should specify the ingress-controller via the field ingressClassName
     # See https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#specifying-the-class-of-an-ingress
-    ingressClassName: traefik
+    # ingressClassName: traefik
 
     annotations:
       cert-manager.io/cluster-issuer: letsencrypt-production
