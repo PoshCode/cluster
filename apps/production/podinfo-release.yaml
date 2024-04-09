@@ -10,14 +10,16 @@ spec:
   values:
     replicaCount: 2
     serviceMonitor:
-      enabled: true
+      enabled: false
+      interval: 15s
+      additionalLabels: {}
+
     resources:
       limits:
-        cpu: 10m
-        memory: 32Mi
+        memory: 256Mi
       requests:
-        cpu: 10m
-        memory: 32Mi
+        cpu: 100m
+        memory: 64Mi
     hpa:
       enabled: true
       maxReplicas: 5
