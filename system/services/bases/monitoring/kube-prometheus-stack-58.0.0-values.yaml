@@ -286,8 +286,6 @@ alertmanager:
 
   ## Configure pod disruption budgets for Alertmanager
   ## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/#specifying-a-poddisruptionbudget
-  ## This configuration is immutable once created and will require the PDB to be deleted to be changed
-  ## https://github.com/kubernetes/kubernetes/issues/45398
   ##
   podDisruptionBudget:
     enabled: false
@@ -2157,6 +2155,10 @@ prometheusOperator:
   ## The default value is 10, 0 will garbage-collect old replicasets ##
   revisionHistoryLimit: 10
 
+  ## Strategy of the deployment
+  ##
+  strategy: {}
+
   ## Prometheus-Operator v0.39.0 and later support TLS natively.
   ##
   tls:
@@ -3072,8 +3074,6 @@ prometheus:
 
   ## Configure pod disruption budgets for Prometheus
   ## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/#specifying-a-poddisruptionbudget
-  ## This configuration is immutable once created and will require the PDB to be deleted to be changed
-  ## https://github.com/kubernetes/kubernetes/issues/45398
   ##
   podDisruptionBudget:
     enabled: false
@@ -3350,7 +3350,7 @@ prometheus:
     image:
       registry: quay.io
       repository: prometheus/prometheus
-      tag: v2.50.1
+      tag: v2.51.1
       sha: ""
 
     ## Tolerations for use with node taints
@@ -4172,8 +4172,6 @@ thanosRuler:
 
   ## Configure pod disruption budgets for ThanosRuler
   ## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/#specifying-a-poddisruptionbudget
-  ## This configuration is immutable once created and will require the PDB to be deleted to be changed
-  ## https://github.com/kubernetes/kubernetes/issues/45398
   ##
   podDisruptionBudget:
     enabled: false

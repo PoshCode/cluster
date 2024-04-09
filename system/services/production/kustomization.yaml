@@ -15,7 +15,20 @@ patches:
     target:
       kind: HelmRelease
       name: dex
+  - path: kube-prometheus-release.yaml
+    target:
+      kind: HelmRelease
+      name: kube-prometheus-stack
   - path: networking-gateway.yaml
     target:
       kind: Gateway
 
+
+configMapGenerator:
+  - name: prometheus-values
+    namespace: flux-system
+    files:
+      - values.yaml=kube-prometheus-values.yaml
+
+configurations:
+  - valuesfrom.yaml

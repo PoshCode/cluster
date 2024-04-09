@@ -6,3 +6,13 @@ resources:
   - gateway-networking-v1.0.0-referencegrants.yaml
   - gateway-networking-v1.0.0-grpcroutes.yaml
   - gateway-networking-v1.0.0-tlsroutes.yaml
+  - monitoring.coreos.com_0.73.0_alertmanagerconfigs.yaml
+  - monitoring.coreos.com_0.73.0_alertmanagers.yaml
+  - monitoring.coreos.com_0.73.0_podmonitors.yaml
+  - monitoring.coreos.com_0.73.0_probes.yaml
+  - monitoring.coreos.com_0.73.0_prometheusagents.yaml
+  - monitoring.coreos.com_0.73.0_prometheuses.yaml
+  - monitoring.coreos.com_0.73.0_prometheusrules.yaml
+  - monitoring.coreos.com_0.73.0_scrapeconfigs.yaml
+  - monitoring.coreos.com_0.73.0_servicemonitors.yaml
+  - monitoring.coreos.com_0.73.0_thanosrulers.yaml

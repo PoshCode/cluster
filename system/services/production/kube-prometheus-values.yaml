@@ -8,11 +8,11 @@ nameOverride: ""
 
 ## Override the deployment namespace
 ##
-namespaceOverride: ""
+namespaceOverride: "monitoring"
 
 ## Provide a k8s version to auto dashboard import script example: kubeTargetVersionOverride: 1.26.6
 ##
-kubeTargetVersionOverride: ""
+kubeTargetVersionOverride: "1.27.9"
 
 ## Allow kubeVersion to be overridden while creating the ingress
 ##
@@ -80,7 +80,7 @@ defaultRules:
     nodeExporterRecording: true
     prometheus: true
     prometheusOperator: true
-    windows: true
+    windows: false
 
   ## Reduce app namespace alert scope
   appNamespacesTarget: ".*"
@@ -280,7 +280,7 @@ alertmanager:
   ##
   serviceAccount:
     create: true
-    name: ""
+    name: "poshcode-alerts"
     annotations: {}
     automountServiceAccountToken: true
 
@@ -389,22 +389,24 @@ alertmanager:
 
     # For Kubernetes >= 1.18 you should specify the ingress-controller via the field ingressClassName
     # See https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#specifying-the-class-of-an-ingress
-    # ingressClassName: nginx
+    ingressClassName: traefik
 
-    annotations: {}
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-production
+      traefik.ingress.kubernetes.io/router.middlewares: traefik-forward-auth@kubernetescrd
 
     labels: {}
 
     ## Override ingress to a different defined port on the service
-    # servicePort: 8081
+    # servicePort: 8083
     ## Override ingress to a different service then the default, this is useful if you need to
     ## point to a specific instance of the alertmanager (eg kube-prometheus-stack-alertmanager-0)
     # serviceName: kube-prometheus-stack-alertmanager-0
 
     ## Hosts must be provided if Ingress is enabled.
     ##
-    hosts: []
-      # - alertmanager.domain.com
+    hosts:
+    - alerts.poshcode.com
 
     ## Paths to use for ingress rules - one path should match the alertmanagerSpec.routePrefix
     ##
@@ -418,7 +420,10 @@ alertmanager:
     ## TLS configuration for Alertmanager Ingress
     ## Secret must be manually created in the namespace
     ##
-    tls: []
+    tls:
+    - secretName: alerts-poshcode-com-tls
+      hosts:
+      - alerts.poshcode.com
     # - secretName: alertmanager-general-tls
     #   hosts:
     #   - alertmanager.example.com
@@ -495,13 +500,13 @@ alertmanager:
 
     ## Additional ports to open for Alertmanager service
     ##
-    additionalPorts: []
-    # - name: oauth-proxy
-    #   port: 8081
-    #   targetPort: 8081
-    # - name: oauth-metrics
-    #   port: 8082
-    #   targetPort: 8082
+    additionalPorts:
+    - name: oauth-proxy
+      port: 8083
+      targetPort: 8083
+    - name: oauth-metrics
+      port: 8084
+      targetPort: 8084
 
     externalIPs: []
     loadBalancerIP: ""
@@ -630,9 +635,9 @@ alertmanager:
 
     ## Additional Endpoints
     ##
-    additionalEndpoints: []
-    # - port: oauth-metrics
-    #   path: /metrics
+    additionalEndpoints:
+    - port: oauth-metrics
+      path: /metrics
 
   ## Settings affecting alertmanagerSpec
   ## ref: https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#alertmanagerspec
@@ -857,23 +862,40 @@ alertmanager:
 
     ## Containers allows injecting additional containers. This is meant to allow adding an authentication proxy to an Alertmanager pod.
     ##
-    containers: []
-    # containers:
-    # - name: oauth-proxy
-    #   image: quay.io/oauth2-proxy/oauth2-proxy:v7.5.1
-    #   args:
-    #   - --upstream=http://127.0.0.1:9093
-    #   - --http-address=0.0.0.0:8081
-    #   - --metrics-address=0.0.0.0:8082
-    #   - ...
-    #   ports:
-    #   - containerPort: 8081
-    #     name: oauth-proxy
-    #     protocol: TCP
-    #   - containerPort: 8082
-    #     name: oauth-metrics
-    #     protocol: TCP
-    #   resources: {}
+    containers:
+    - name: oauth-proxy
+      image: quay.io/oauth2-proxy/oauth2-proxy:v7.6.0
+      args:
+      - --upstream=http://127.0.0.1:9093
+      - --http-address=0.0.0.0:8083
+      - --metrics-address=0.0.0.0:8084
+      - --provider=oidc
+      - --oidc-issuer-url=https://dex.poshcode.com
+      - --redirect-url=https://alerts.poshcode.com/oauth2/callback
+      - --code-challenge-method=S256
+      - --scope=openid profile email
+      - --email-domain=*
+      env:
+      - name: OAUTH2_PROXY_CLIENT_ID
+        value: oauth2-proxy-kube-prometheus-stack
+      - name: OAUTH2_PROXY_CLIENT_SECRET
+        valueFrom:
+          secretKeyRef:
+            name: kube-prometheus-stack-prometheus-oauth2-proxy
+            key: client-secret
+      - name: OAUTH2_PROXY_COOKIE_SECRET
+        valueFrom:
+          secretKeyRef:
+            name: kube-prometheus-stack-prometheus-oauth2-proxy
+            key: cookie-secret
+      ports:
+      - containerPort: 8083
+        name: oauth-proxy
+        protocol: TCP
+      - containerPort: 8084
+        name: oauth-metrics
+        protocol: TCP
+      resources: {}
 
     # Additional volumes on the output StatefulSet definition.
     volumes: []
@@ -944,6 +966,34 @@ alertmanager:
 ##
 grafana:
   enabled: true
+
+  envFromSecret: kube-prometheus-stack-grafana-env
+  grafana.ini:
+    server:
+      domain: grafana.poshcode.com
+      root_url: https://grafana.poshcode.com
+      enforce_domain: true
+      enable_gzip: true
+    security:
+      disable_gravatar: true
+    dashboards:
+      min_refresh_interval: 60s
+    auth.generic_oauth:
+      name: Dex
+      enabled: true
+      # client_id: $GF_AUTH_GENERIC_OAUTH_CLIENT_ID
+      # client_secret: $GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET
+      allow_sign_up: true
+      auto_login: false # if true, you go directly to dex
+      scopes: openid profile email groups
+      auth_url: https://dex.poshcode.com/auth
+      token_url: https://dex.poshcode.com/token
+      api_url: https://dex.poshcode.com/userinfo
+      email_attribute_path: email
+      skip_org_role_sync: true
+      allow_assign_grafana_admin: true
+      auto_assign_org_role: Admin
+
   namespaceOverride: ""
 
   ## ForceDeployDatasources Create datasource configmap even if grafana deployment has been disabled
@@ -967,7 +1017,9 @@ grafana:
   ##
   defaultDashboardsEditable: true
 
-  adminPassword: prom-operator
+  adminPassword:
+  admin:
+    existingSecret: kube-prometheus-stack-grafana-admin
 
   rbac:
     ## If true, Grafana PSPs will be created
@@ -982,11 +1034,13 @@ grafana:
     ## IngressClassName for Grafana Ingress.
     ## Should be provided if Ingress is enable.
     ##
-    # ingressClassName: nginx
+    ingressClassName: traefik
 
     ## Annotations for Grafana Ingress
     ##
-    annotations: {}
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-production
+      traefik.ingress.kubernetes.io/router.middlewares: traefik-forward-auth@kubernetescrd
       # kubernetes.io/ingress.class: nginx
       # kubernetes.io/tls-acme: "true"
 
@@ -999,7 +1053,8 @@ grafana:
     ##
     # hosts:
     #   - grafana.domain.com
-    hosts: []
+    hosts:
+    - grafana.poshcode.com
 
     ## Path for grafana ingress
     path: /
@@ -1007,10 +1062,10 @@ grafana:
     ## TLS configuration for grafana Ingress
     ## Secret must be manually created in the namespace
     ##
-    tls: []
-    # - secretName: grafana-general-tls
-    #   hosts:
-    #   - grafana.example.com
+    tls:
+    - secretName: grafana-poshcode-com-tls
+      hosts:
+      - grafana.poshcode.com
 
   # # To make Grafana persistent (Using Statefulset)
   # #
@@ -2459,9 +2514,9 @@ prometheusOperator:
         duration: ""  # default to be 5y
       admissionCert:
         duration: ""  # default to be 1y
-      # issuerRef:
-      #   name: "issuer"
-      #   kind: "ClusterIssuer"
+      issuerRef:
+        name: letsencrypt-production
+        kind: ClusterIssuer
 
   ## Namespaces to scope the interaction of the Prometheus Operator and the apiserver (allow list).
   ## This is mutually exclusive with denyNamespaces. Setting this to an empty object will disable the configuration
@@ -2497,7 +2552,7 @@ prometheusOperator:
     #  Can be:
     #  * kubernetes for networking.k8s.io/v1/NetworkPolicy
     #  * cilium     for cilium.io/v2/CiliumNetworkPolicy
-    flavor: kubernetes
+    flavor: cilium
 
     # cilium:
     #   egress:
@@ -2854,7 +2909,7 @@ prometheus:
     #  Can be:
     #  * kubernetes for networking.k8s.io/v1/NetworkPolicy
     #  * cilium     for cilium.io/v2/CiliumNetworkPolicy
-    flavor: kubernetes
+    flavor: cilium
 
     # cilium:
     #   endpointSelector:
@@ -3015,14 +3070,13 @@ prometheus:
 
     ## Additional ports to open for Prometheus service
     ##
-    additionalPorts: []
-    # additionalPorts:
-    # - name: oauth-proxy
-    #   port: 8081
-    #   targetPort: 8081
-    # - name: oauth-metrics
-    #   port: 8082
-    #   targetPort: 8082
+    additionalPorts:
+    - name: oauth-proxy
+      port: 8081
+      targetPort: 8081
+    - name: oauth-metrics
+      port: 8082
+      targetPort: 8082
 
     ## Consider that all endpoints are considered "ready" even if the Pods themselves are not
     ## Ref: https://kubernetes.io/docs/reference/kubernetes-api/service-resources/service-v1/#ServiceSpec
@@ -3136,9 +3190,11 @@ prometheus:
 
     # For Kubernetes >= 1.18 you should specify the ingress-controller via the field ingressClassName
     # See https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#specifying-the-class-of-an-ingress
-    # ingressClassName: nginx
+    ingressClassName: traefik
 
-    annotations: {}
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-production
+      traefik.ingress.kubernetes.io/router.middlewares: traefik-forward-auth@kubernetescrd
     labels: {}
 
     ## Redirect ingress to an additional defined port on the service
@@ -3149,12 +3205,14 @@ prometheus:
     ##
     # hosts:
     #   - prometheus.domain.com
-    hosts: []
+    hosts:
+    - prometheus.poshcode.com
 
     ## Paths to use for ingress rules - one path should match the prometheusSpec.routePrefix
     ##
-    paths: []
-    # - /
+    paths:
+      - /
+    pathType: Prefix
 
     ## For Kubernetes >= 1.18 you should specify the pathType (determines how Ingress paths should be matched)
     ## See https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#better-path-matching-with-path-types
@@ -3163,10 +3221,10 @@ prometheus:
     ## TLS configuration for Prometheus Ingress
     ## Secret must be manually created in the namespace
     ##
-    tls: []
-      # - secretName: prometheus-general-tls
-      #   hosts:
-      #     - prometheus.example.com
+    tls:
+      - secretName: prometheus-poshcode-com-tls
+        hosts:
+        - prometheus.poshcode.com
 
   ## Configuration for creating an Ingress that will map to each Prometheus replica service
   ## prometheus.servicePerReplica must be enabled
@@ -3280,9 +3338,9 @@ prometheus:
 
     ## Additional Endpoints
     ##
-    additionalEndpoints: []
-    # - port: oauth-metrics
-    #   path: /metrics
+    additionalEndpoints:
+    - port: oauth-metrics
+      path: /metrics
 
   ## Settings affecting prometheusSpec
   ## ref: https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#prometheusspec
@@ -3850,23 +3908,40 @@ prometheus:
 
     ## Containers allows injecting additional containers. This is meant to allow adding an authentication proxy to a Prometheus pod.
     ## if using proxy extraContainer update targetPort with proxy container port
-    containers: []
-    # containers:
-    # - name: oauth-proxy
-    #   image: quay.io/oauth2-proxy/oauth2-proxy:v7.5.1
-    #   args:
-    #   - --upstream=http://127.0.0.1:9090
-    #   - --http-address=0.0.0.0:8081
-    #   - --metrics-address=0.0.0.0:8082
-    #   - ...
-    #   ports:
-    #   - containerPort: 8081
-    #     name: oauth-proxy
-    #     protocol: TCP
-    #   - containerPort: 8082
-    #     name: oauth-metrics
-    #     protocol: TCP
-    #   resources: {}
+    containers:
+    - name: oauth-proxy
+      image: quay.io/oauth2-proxy/oauth2-proxy:v7.6.0
+      args:
+      - --upstream=http://127.0.0.1:9090
+      - --http-address=0.0.0.0:8081
+      - --metrics-address=0.0.0.0:8082
+      - --provider=oidc
+      - --oidc-issuer-url=https://dex.poshcode.com
+      - --redirect-url=https://prometheus.poshcode.com/oauth2/callback
+      - --code-challenge-method=S256
+      - --scope=openid profile email
+      - --email-domain=*
+      env:
+      - name: OAUTH2_PROXY_CLIENT_ID
+        value: oauth2-proxy-kube-prometheus-stack
+      - name: OAUTH2_PROXY_CLIENT_SECRET
+        valueFrom:
+          secretKeyRef:
+            name: kube-prometheus-stack-prometheus-oauth2-proxy
+            key: client-secret
+      - name: OAUTH2_PROXY_COOKIE_SECRET
+        valueFrom:
+          secretKeyRef:
+            name: kube-prometheus-stack-prometheus-oauth2-proxy
+            key: cookie-secret
+      ports:
+      - containerPort: 8081
+        name: oauth-proxy
+        protocol: TCP
+      - containerPort: 8082
+        name: oauth-metrics
+        protocol: TCP
+      resources: {}
 
     ## InitContainers allows injecting additional initContainers. This is meant to allow doing some changes
     ## (permissions, dir tree) on mounted volumes before starting prometheus
@@ -4318,9 +4393,9 @@ thanosRuler:
 
     ## Additional Endpoints
     ##
-    additionalEndpoints: []
-    # - port: oauth-metrics
-    #   path: /metrics
+    additionalEndpoints:
+    - port: oauth-metrics
+      path: /metrics
 
   ## Settings affecting thanosRulerpec
   ## ref: https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#thanosrulerspec
