@@ -26,5 +26,5 @@ spec:
       requests: 100
     ui:
       color: "#34577c"
-      message: "Hello"
-      logo: ""
+      message: "Greetings"
+      logo: https://raw.githubusercontent.com/PowerShell/PowerShell/master/assets/Square150x150Logo-Preview.png
