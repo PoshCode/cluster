@@ -25,6 +25,6 @@ spec:
       maxReplicas: 5
       requests: 100
     ui:
-      color: "#34577c"
+      color: "#00a3c9"
       message: "Greetings, Humans"
       logo: https://raw.githubusercontent.com/PowerShell/PowerShell/master/assets/Chibi_Avatar.png
