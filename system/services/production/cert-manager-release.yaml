@@ -8,5 +8,10 @@ spec:
     spec:
       version: "1.14.x"
   values:
+    prometheus:
+      enabled: true
+      servicemonitor:
+        enabled: true
+
     extraArgs:
     - --feature-gates=ExperimentalGatewayAPISupport=true

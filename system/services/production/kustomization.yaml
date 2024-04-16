@@ -23,7 +23,6 @@ patches:
     target:
       kind: Gateway
 
-
 configMapGenerator:
   - name: prometheus-values
     namespace: flux-system

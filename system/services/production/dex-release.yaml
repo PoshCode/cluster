@@ -12,3 +12,5 @@ spec:
     configSecret:
       create: false
       name: dex-config
+    serviceMonitor:
+      enabled: true

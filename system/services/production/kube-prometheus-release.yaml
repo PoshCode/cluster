@@ -6,3 +6,6 @@ spec:
   chart:
     spec:
       version: "58.0.x"
+  valuesFrom:
+  - kind: ConfigMap
+    name: prometheus-values

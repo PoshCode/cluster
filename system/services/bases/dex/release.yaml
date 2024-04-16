@@ -11,7 +11,7 @@ spec:
   chart:
     spec:
       chart: dex
-      version: "0.15.3"
+      version: "0.17.x"
       sourceRef:
         kind: HelmRepository
         name: dex
@@ -25,6 +25,3 @@ spec:
       retries: 5
   rollback:
     timeout: 5m
-  valuesFrom:
-  - kind: ConfigMap
-    name: dex-values
