@@ -3,6 +3,7 @@ kind: HelmRelease
 metadata:
   name: kube-prometheus-stack
 spec:
+  targetNamespace: monitoring
   chart:
     spec:
       version: "58.0.x"

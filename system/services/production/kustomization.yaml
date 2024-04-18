@@ -4,7 +4,7 @@ resources:
   - kube-prometheus-stack-secret.yaml
   - ../bases/cert-manager
   - ../bases/dex
-  - ../bases/monitoring
+  - ../bases/kube-prometheus-stack
   - ../bases/networking
 patches:
   - path: cert-manager-release.yaml

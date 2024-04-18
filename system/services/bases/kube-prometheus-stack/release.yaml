@@ -11,12 +11,12 @@ spec:
   chart:
     spec:
       chart: kube-prometheus-stack
-      version: "56.21.x"
+      version: "58.x"
       sourceRef:
         kind: HelmRepository
         name: prometheus-community
         namespace: flux-system
-      interval: 12h
+      interval: 60m
   install:
     remediation:
       retries: 2
