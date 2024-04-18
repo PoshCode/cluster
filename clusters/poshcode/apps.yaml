@@ -19,4 +19,4 @@ spec:
     provider: sops
   commonMetadata:
     annotations:
-      poshcode.org/tenant: sre-team
+      poshcode.org/tenant: dev-team
