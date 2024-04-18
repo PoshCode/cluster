@@ -1,15 +1,33 @@
-# PoshCode k8s Cluster
+# PoshCode Kubernetes Cluster
 
 This repo has my gitOps configuration for the PoshCode Kubernetes cluster.
 
 The actual cluster is an AKS cluster deployed with my [Azure Bicep templates](/PoshCode/aks-bicep), which are kept in a separate repository to avoid extra reconciliation.
 
-## GitOps Configuration
+## Flux GitOps with Kustomize
 
-The GitOps configuration is in the `clusters`, `system`, and `apps` folders. It's all in yaml, and it's all managed by [Flux CD](https://fluxcd.io/).
+This is our GitOps repository, and it's all Kustomize yaml, and reconciled by [Flux CD](https://fluxcd.io/).
 
-Each cluster gets a base Flux Kustomization that points at a subfolder of `clusters` for it's configuration. That is, each cluster should have it's _own_ folder in the `clusters` folder, and within each there are additional nested Kustomizations to deploy the "system" configuration and any "apps".
+Three folders are important:
+
+1. The actual cluster applications are in `apps`
+2. The `system` folder contains `crds` and `services` (stuff like cert-manager, prometheus, etc)
+3. The `clusters` folder has a subfolder for each cluster ...
+
+We follow the [bases and overlays](https://kubernetes.io/docs/tasks/manage-kubernetes-objects/kustomization/#bases-and-overlays) pattern for Kustomize, so both "apps" and "services" have a `bases` folder with the common configuration, and then a folder for each cluster with the specific configuration. To simplify setup, the `clusters` folder has a subfolder for each cluster, and each of those has flux kustomization to deploy the crds, services, and apps (for that specific cluster) as nested kustomizations.
+
+In other words, each cluster only needs a single Flux Kustomization that points at a subfolder of `clusters`, and the rest of the configuration for the cluster is in this repository.
 
 ## GitOps Application Config
 
-Each application subfolder represents a namespace (sometimes nested in a tenant namespace), and should have an overlay for each cluster that deploys it. Usually the application would have a helm chart, so the base configuration would be the helm repository and release, and the overlays would specify the version and value overrides to use.
+In general, each application or service has a helm chart, so the base configuration is a folder in `apps/bases` that just contains the helm `repository` and `release`, and perhaps the http-route or shared secrets.
+
+For each kubernetes cluster, there's then an overlay folder like `apps/production` that specifies the version of the chart and the value overrides to use.
+
+## See Also...
+
+A lot of what you'll see here is based on these two Flux examples, which are both simpler and more documented than this repository.
+
+- [Flux Kustomize + Helm](https://github.com/fluxcd/flux2-kustomize-helm-example)
+- [Flux Monitoring Example](https://github.com/fluxcd/flux2-monitoring-example)
+
