@@ -84,7 +84,7 @@
             "spanNulls": false,
             "stacking": {
               "group": "A",
-              "mode": "none"
+              "mode": "normal"
             },
             "thresholdsStyle": {
               "mode": "off"
@@ -128,7 +128,7 @@
       "targets": [
         {
           "datasource": "${DS_LOKI}",
-          "expr": "sum(count_over_time({namespace=~\"$namespace\", stream=~\"$stream\", app =~\"$controller\"} | json | __error__!=\"JSONParserErr\" | level=~\"$level\" |= \"$query\" [$__interval]))",
+          "expr": "sum by (level) (count_over_time ({namespace=~\"$namespace\", stream=~\"$stream\", app =~\"$controller\"} | json | __error__!=\"JSONParserErr\" | label_format level=LogLevel | level=~\"$level\" |= \"$query\" [$__interval]))",
           "instant": false,
           "legendFormat": "Log count",
           "range": true,
