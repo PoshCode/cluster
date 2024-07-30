@@ -8,11 +8,11 @@ nameOverride: ""
 
 ## Override the deployment namespace
 ##
-namespaceOverride: "monitoring"
+namespaceOverride: ""
 
 ## Provide a k8s version to auto dashboard import script example: kubeTargetVersionOverride: 1.26.6
 ##
-kubeTargetVersionOverride: "1.28.5"
+kubeTargetVersionOverride: ""
 
 ## Allow kubeVersion to be overridden while creating the ingress
 ##
@@ -31,7 +31,7 @@ commonLabels: {}
 ## Install Prometheus Operator CRDs
 ##
 crds:
-  enabled: false
+  enabled: true
 
 ## custom Rules to override "for" and "severity" in defaultRules
 ##
@@ -80,7 +80,7 @@ defaultRules:
     nodeExporterRecording: true
     prometheus: true
     prometheusOperator: true
-    windows: false
+    windows: true
 
   ## Reduce app namespace alert scope
   appNamespacesTarget: ".*"
@@ -284,7 +284,7 @@ alertmanager:
   ##
   serviceAccount:
     create: true
-    name: "poshcode-alerts"
+    name: ""
     annotations: {}
     automountServiceAccountToken: true
 
@@ -391,24 +391,22 @@ alertmanager:
 
     # For Kubernetes >= 1.18 you should specify the ingress-controller via the field ingressClassName
     # See https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#specifying-the-class-of-an-ingress
-    # ingressClassName: traefik
+    # ingressClassName: nginx
 
-    annotations:
-      cert-manager.io/cluster-issuer: letsencrypt-production
-      traefik.ingress.kubernetes.io/router.middlewares: traefik-forward-auth@kubernetescrd
+    annotations: {}
 
     labels: {}
 
     ## Override ingress to a different defined port on the service
-    # servicePort: 8083
+    # servicePort: 8081
     ## Override ingress to a different service then the default, this is useful if you need to
     ## point to a specific instance of the alertmanager (eg kube-prometheus-stack-alertmanager-0)
     # serviceName: kube-prometheus-stack-alertmanager-0
 
     ## Hosts must be provided if Ingress is enabled.
     ##
-    hosts:
-    - alerts.poshcode.com
+    hosts: []
+      # - alertmanager.domain.com
 
     ## Paths to use for ingress rules - one path should match the alertmanagerSpec.routePrefix
     ##
@@ -422,10 +420,7 @@ alertmanager:
     ## TLS configuration for Alertmanager Ingress
     ## Secret must be manually created in the namespace
     ##
-    tls:
-    - secretName: alerts-poshcode-com-tls
-      hosts:
-      - alerts.poshcode.com
+    tls: []
     # - secretName: alertmanager-general-tls
     #   hosts:
     #   - alertmanager.example.com
@@ -506,13 +501,13 @@ alertmanager:
 
     ## Additional ports to open for Alertmanager service
     ##
-    additionalPorts:
-    - name: oauth-proxy
-      port: 8083
-      targetPort: 8083
-    - name: oauth-metrics
-      port: 8084
-      targetPort: 8084
+    additionalPorts: []
+    # - name: oauth-proxy
+    #   port: 8081
+    #   targetPort: 8081
+    # - name: oauth-metrics
+    #   port: 8082
+    #   targetPort: 8082
 
     externalIPs: []
     loadBalancerIP: ""
@@ -641,9 +636,9 @@ alertmanager:
 
     ## Additional Endpoints
     ##
-    additionalEndpoints:
-    - port: oauth-metrics
-      path: /metrics
+    additionalEndpoints: []
+    # - port: oauth-metrics
+    #   path: /metrics
 
   ## Settings affecting alertmanagerSpec
   ## ref: https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#alertmanagerspec
@@ -868,40 +863,23 @@ alertmanager:
 
     ## Containers allows injecting additional containers. This is meant to allow adding an authentication proxy to an Alertmanager pod.
     ##
-    containers:
-    - name: oauth-proxy
-      image: quay.io/oauth2-proxy/oauth2-proxy:v7.6.0
-      args:
-      - --upstream=http://127.0.0.1:9093
-      - --http-address=0.0.0.0:8083
-      - --metrics-address=0.0.0.0:8084
-      - --provider=oidc
-      - --oidc-issuer-url=https://dex.poshcode.com
-      - --redirect-url=https://alerts.poshcode.com/oauth2/callback
-      - --code-challenge-method=S256
-      - --scope=openid profile email
-      - --email-domain=*
-      env:
-      - name: OAUTH2_PROXY_CLIENT_ID
-        value: oauth2-proxy-kube-prometheus-stack
-      - name: OAUTH2_PROXY_CLIENT_SECRET
-        valueFrom:
-          secretKeyRef:
-            name: kube-prometheus-stack-prometheus-oauth2-proxy
-            key: client-secret
-      - name: OAUTH2_PROXY_COOKIE_SECRET
-        valueFrom:
-          secretKeyRef:
-            name: kube-prometheus-stack-prometheus-oauth2-proxy
-            key: cookie-secret
-      ports:
-      - containerPort: 8083
-        name: oauth-proxy
-        protocol: TCP
-      - containerPort: 8084
-        name: oauth-metrics
-        protocol: TCP
-      resources: {}
+    containers: []
+    # containers:
+    # - name: oauth-proxy
+    #   image: quay.io/oauth2-proxy/oauth2-proxy:v7.5.1
+    #   args:
+    #   - --upstream=http://127.0.0.1:9093
+    #   - --http-address=0.0.0.0:8081
+    #   - --metrics-address=0.0.0.0:8082
+    #   - ...
+    #   ports:
+    #   - containerPort: 8081
+    #     name: oauth-proxy
+    #     protocol: TCP
+    #   - containerPort: 8082
+    #     name: oauth-metrics
+    #     protocol: TCP
+    #   resources: {}
 
     # Additional volumes on the output StatefulSet definition.
     volumes: []
@@ -972,34 +950,6 @@ alertmanager:
 ##
 grafana:
   enabled: true
-
-  envFromSecret: kube-prometheus-stack-grafana-env
-  grafana.ini:
-    server:
-      domain: grafana.poshcode.com
-      root_url: https://grafana.poshcode.com
-      enforce_domain: true
-      enable_gzip: true
-    security:
-      disable_gravatar: true
-    dashboards:
-      min_refresh_interval: 60s
-    auth.generic_oauth:
-      name: Dex
-      enabled: true
-      # client_id: $GF_AUTH_GENERIC_OAUTH_CLIENT_ID
-      # client_secret: $GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET
-      allow_sign_up: true
-      auto_login: false # if true, you go directly to dex
-      scopes: openid profile email groups
-      auth_url: https://dex.poshcode.com/auth
-      token_url: https://dex.poshcode.com/token
-      api_url: https://dex.poshcode.com/userinfo
-      email_attribute_path: email
-      skip_org_role_sync: true
-      allow_assign_grafana_admin: true
-      auto_assign_org_role: Admin
-
   namespaceOverride: ""
 
   ## ForceDeployDatasources Create datasource configmap even if grafana deployment has been disabled
@@ -1023,9 +973,7 @@ grafana:
   ##
   defaultDashboardsEditable: true
 
-  adminPassword:
-  admin:
-    existingSecret: kube-prometheus-stack-grafana-admin
+  adminPassword: prom-operator
 
   rbac:
     ## If true, Grafana PSPs will be created
@@ -1040,13 +988,11 @@ grafana:
     ## IngressClassName for Grafana Ingress.
     ## Should be provided if Ingress is enable.
     ##
-    ingressClassName: traefik
+    # ingressClassName: nginx
 
     ## Annotations for Grafana Ingress
     ##
-    annotations:
-      cert-manager.io/cluster-issuer: letsencrypt-production
-      traefik.ingress.kubernetes.io/router.middlewares: traefik-forward-auth@kubernetescrd
+    annotations: {}
       # kubernetes.io/ingress.class: nginx
       # kubernetes.io/tls-acme: "true"
 
@@ -1059,8 +1005,7 @@ grafana:
     ##
     # hosts:
     #   - grafana.domain.com
-    hosts:
-    - grafana.poshcode.com
+    hosts: []
 
     ## Path for grafana ingress
     path: /
@@ -1068,10 +1013,10 @@ grafana:
     ## TLS configuration for grafana Ingress
     ## Secret must be manually created in the namespace
     ##
-    tls:
-    - secretName: grafana-poshcode-com-tls
-      hosts:
-      - grafana.poshcode.com
+    tls: []
+    # - secretName: grafana-general-tls
+    #   hosts:
+    #   - grafana.example.com
 
   # # To make Grafana persistent (Using Statefulset)
   # #
@@ -2087,278 +2032,6 @@ kube-state-metrics:
   namespaceOverride: ""
   rbac:
     create: true
-    extraArgs:
-      - --custom-resource-state-only=true
-    extraRules:
-      - apiGroups:
-          - source.toolkit.fluxcd.io
-          - kustomize.toolkit.fluxcd.io
-          - helm.toolkit.fluxcd.io
-          - notification.toolkit.fluxcd.io
-          - image.toolkit.fluxcd.io
-        resources:
-          - gitrepositories
-          - buckets
-          - helmrepositories
-          - helmcharts
-          - ocirepositories
-          - kustomizations
-          - helmreleases
-          - alerts
-          - providers
-          - receivers
-          - imagerepositories
-          - imagepolicies
-          - imageupdateautomations
-        verbs: [ "list", "watch" ]
-  customResourceState:
-    enabled: true
-    config:
-      spec:
-        resources:
-          - groupVersionKind:
-              group: kustomize.toolkit.fluxcd.io
-              version: v1
-              kind: Kustomization
-            metricNamePrefix: gotk
-            metrics:
-              - name: "resource_info"
-                help: "The current state of a Flux Kustomization resource."
-                each:
-                  type: Info
-                  info:
-                    labelsFromPath:
-                      name: [ metadata, name ]
-                labelsFromPath:
-                  exported_namespace: [ metadata, namespace ]
-                  ready: [ status, conditions, "[type=Ready]", status ]
-                  suspended: [ spec, suspend ]
-                  revision: [ status, lastAppliedRevision ]
-                  source_name: [ spec, sourceRef, name ]
-          - groupVersionKind:
-              group: helm.toolkit.fluxcd.io
-              version: v2beta1
-              kind: HelmRelease
-            metricNamePrefix: gotk
-            metrics:
-              - name: "resource_info"
-                help: "The current state of a Flux HelmRelease resource."
-                each:
-                  type: Info
-                  info:
-                    labelsFromPath:
-                      name: [ metadata, name ]
-                labelsFromPath:
-                  exported_namespace: [ metadata, namespace ]
-                  ready: [ status, conditions, "[type=Ready]", status ]
-                  suspended: [ spec, suspend ]
-                  revision: [ status, lastAppliedRevision ]
-                  chart_name: [ spec, chart, spec, chart ]
-                  chart_source_name: [ spec, chart, spec, sourceRef, name ]
-          - groupVersionKind:
-              group: source.toolkit.fluxcd.io
-              version: v1
-              kind: GitRepository
-            metricNamePrefix: gotk
-            metrics:
-              - name: "resource_info"
-                help: "The current state of a Flux GitRepository resource."
-                each:
-                  type: Info
-                  info:
-                    labelsFromPath:
-                      name: [ metadata, name ]
-                labelsFromPath:
-                  exported_namespace: [ metadata, namespace ]
-                  ready: [ status, conditions, "[type=Ready]", status ]
-                  suspended: [ spec, suspend ]
-                  revision: [ status, artifact, revision ]
-                  url: [ spec, url ]
-          - groupVersionKind:
-              group: source.toolkit.fluxcd.io
-              version: v1beta2
-              kind: Bucket
-            metricNamePrefix: gotk
-            metrics:
-              - name: "resource_info"
-                help: "The current state of a Flux Bucket resource."
-                each:
-                  type: Info
-                  info:
-                    labelsFromPath:
-                      name: [ metadata, name ]
-                labelsFromPath:
-                  exported_namespace: [ metadata, namespace ]
-                  ready: [ status, conditions, "[type=Ready]", status ]
-                  suspended: [ spec, suspend ]
-                  revision: [ status, artifact, revision ]
-                  endpoint: [ spec, endpoint ]
-                  bucket_name: [ spec, bucketName ]
-          - groupVersionKind:
-              group: source.toolkit.fluxcd.io
-              version: v1beta2
-              kind: HelmRepository
-            metricNamePrefix: gotk
-            metrics:
-              - name: "resource_info"
-                help: "The current state of a Flux HelmRepository resource."
-                each:
-                  type: Info
-                  info:
-                    labelsFromPath:
-                      name: [ metadata, name ]
-                labelsFromPath:
-                  exported_namespace: [ metadata, namespace ]
-                  ready: [ status, conditions, "[type=Ready]", status ]
-                  suspended: [ spec, suspend ]
-                  revision: [ status, artifact, revision ]
-                  url: [ spec, url ]
-          - groupVersionKind:
-              group: source.toolkit.fluxcd.io
-              version: v1beta2
-              kind: HelmChart
-            metricNamePrefix: gotk
-            metrics:
-              - name: "resource_info"
-                help: "The current state of a Flux HelmChart resource."
-                each:
-                  type: Info
-                  info:
-                    labelsFromPath:
-                      name: [ metadata, name ]
-                labelsFromPath:
-                  exported_namespace: [ metadata, namespace ]
-                  ready: [ status, conditions, "[type=Ready]", status ]
-                  suspended: [ spec, suspend ]
-                  revision: [ status, artifact, revision ]
-                  chart_name: [ spec, chart ]
-                  chart_version: [ spec, version ]
-          - groupVersionKind:
-              group: source.toolkit.fluxcd.io
-              version: v1beta2
-              kind: OCIRepository
-            metricNamePrefix: gotk
-            metrics:
-              - name: "resource_info"
-                help: "The current state of a Flux OCIRepository resource."
-                each:
-                  type: Info
-                  info:
-                    labelsFromPath:
-                      name: [ metadata, name ]
-                labelsFromPath:
-                  exported_namespace: [ metadata, namespace ]
-                  ready: [ status, conditions, "[type=Ready]", status ]
-                  suspended: [ spec, suspend ]
-                  revision: [ status, artifact, revision ]
-                  url: [ spec, url ]
-          - groupVersionKind:
-              group: notification.toolkit.fluxcd.io
-              version: v1beta3
-              kind: Alert
-            metricNamePrefix: gotk
-            metrics:
-              - name: "resource_info"
-                help: "The current state of a Flux Alert resource."
-                each:
-                  type: Info
-                  info:
-                    labelsFromPath:
-                      name: [ metadata, name ]
-                labelsFromPath:
-                  exported_namespace: [ metadata, namespace ]
-                  suspended: [ spec, suspend ]
-          - groupVersionKind:
-              group: notification.toolkit.fluxcd.io
-              version: v1beta3
-              kind: Provider
-            metricNamePrefix: gotk
-            metrics:
-              - name: "resource_info"
-                help: "The current state of a Flux Provider resource."
-                each:
-                  type: Info
-                  info:
-                    labelsFromPath:
-                      name: [ metadata, name ]
-                labelsFromPath:
-                  exported_namespace: [ metadata, namespace ]
-                  suspended: [ spec, suspend ]
-          - groupVersionKind:
-              group: notification.toolkit.fluxcd.io
-              version: v1
-              kind: Receiver
-            metricNamePrefix: gotk
-            metrics:
-              - name: "resource_info"
-                help: "The current state of a Flux Receiver resource."
-                each:
-                  type: Info
-                  info:
-                    labelsFromPath:
-                      name: [ metadata, name ]
-                labelsFromPath:
-                  exported_namespace: [ metadata, namespace ]
-                  ready: [ status, conditions, "[type=Ready]", status ]
-                  suspended: [ spec, suspend ]
-                  webhook_path: [ status, webhookPath ]
-          - groupVersionKind:
-              group: image.toolkit.fluxcd.io
-              version: v1beta2
-              kind: ImageRepository
-            metricNamePrefix: gotk
-            metrics:
-              - name: "resource_info"
-                help: "The current state of a Flux ImageRepository resource."
-                each:
-                  type: Info
-                  info:
-                    labelsFromPath:
-                      name: [ metadata, name ]
-                labelsFromPath:
-                  exported_namespace: [ metadata, namespace ]
-                  ready: [ status, conditions, "[type=Ready]", status ]
-                  suspended: [ spec, suspend ]
-                  image: [ spec, image ]
-          - groupVersionKind:
-              group: image.toolkit.fluxcd.io
-              version: v1beta2
-              kind: ImagePolicy
-            metricNamePrefix: gotk
-            metrics:
-              - name: "resource_info"
-                help: "The current state of a Flux ImagePolicy resource."
-                each:
-                  type: Info
-                  info:
-                    labelsFromPath:
-                      name: [ metadata, name ]
-                labelsFromPath:
-                  exported_namespace: [ metadata, namespace ]
-                  ready: [ status, conditions, "[type=Ready]", status ]
-                  suspended: [ spec, suspend ]
-                  source_name: [ spec, imageRepositoryRef, name ]
-          - groupVersionKind:
-              group: image.toolkit.fluxcd.io
-              version: v1beta1
-              kind: ImageUpdateAutomation
-            metricNamePrefix: gotk
-            metrics:
-              - name: "resource_info"
-                help: "The current state of a Flux ImageUpdateAutomation resource."
-                each:
-                  type: Info
-                  info:
-                    labelsFromPath:
-                      name: [ metadata, name ]
-                labelsFromPath:
-                  exported_namespace: [ metadata, namespace ]
-                  ready: [ status, conditions, "[type=Ready]", status ]
-                  suspended: [ spec, suspend ]
-                  source_name: [ spec, sourceRef, name ]
-
-
-
   releaseLabel: true
   prometheus:
     monitor:
@@ -2528,6 +2201,10 @@ prometheusOperator:
   ## Number of old replicasets to retain ##
   ## The default value is 10, 0 will garbage-collect old replicasets ##
   revisionHistoryLimit: 10
+
+  ## Strategy of the deployment
+  ##
+  strategy: {}
 
   ## Prometheus-Operator v0.39.0 and later support TLS natively.
   ##
@@ -2844,9 +2521,9 @@ prometheusOperator:
         duration: ""  # default to be 5y
       admissionCert:
         duration: ""  # default to be 1y
-      issuerRef:
-        name: letsencrypt-production
-        kind: ClusterIssuer
+      # issuerRef:
+      #   name: "issuer"
+      #   kind: "ClusterIssuer"
 
   ## Namespaces to scope the interaction of the Prometheus Operator and the apiserver (allow list).
   ## This is mutually exclusive with denyNamespaces. Setting this to an empty object will disable the configuration
@@ -2882,7 +2559,7 @@ prometheusOperator:
     #  Can be:
     #  * kubernetes for networking.k8s.io/v1/NetworkPolicy
     #  * cilium     for cilium.io/v2/CiliumNetworkPolicy
-    flavor: cilium
+    flavor: kubernetes
 
     # cilium:
     #   egress:
@@ -3244,7 +2921,7 @@ prometheus:
     #  Can be:
     #  * kubernetes for networking.k8s.io/v1/NetworkPolicy
     #  * cilium     for cilium.io/v2/CiliumNetworkPolicy
-    flavor: cilium
+    flavor: kubernetes
 
     # cilium:
     #   endpointSelector:
@@ -3416,13 +3093,14 @@ prometheus:
 
     ## Additional ports to open for Prometheus service
     ##
-    additionalPorts:
-    - name: oauth-proxy
-      port: 8081
-      targetPort: 8081
-    - name: oauth-metrics
-      port: 8082
-      targetPort: 8082
+    additionalPorts: []
+    # additionalPorts:
+    # - name: oauth-proxy
+    #   port: 8081
+    #   targetPort: 8081
+    # - name: oauth-metrics
+    #   port: 8082
+    #   targetPort: 8082
 
     ## Consider that all endpoints are considered "ready" even if the Pods themselves are not
     ## Ref: https://kubernetes.io/docs/reference/kubernetes-api/service-resources/service-v1/#ServiceSpec
@@ -3479,8 +3157,6 @@ prometheus:
 
   ## Configure pod disruption budgets for Prometheus
   ## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/#specifying-a-poddisruptionbudget
-  ## This configuration is immutable once created and will require the PDB to be deleted to be changed
-  ## https://github.com/kubernetes/kubernetes/issues/45398
   ##
   podDisruptionBudget:
     enabled: false
@@ -3543,11 +3219,9 @@ prometheus:
 
     # For Kubernetes >= 1.18 you should specify the ingress-controller via the field ingressClassName
     # See https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#specifying-the-class-of-an-ingress
-    ingressClassName: traefik
+    # ingressClassName: nginx
 
-    annotations:
-      cert-manager.io/cluster-issuer: letsencrypt-production
-      traefik.ingress.kubernetes.io/router.middlewares: traefik-forward-auth@kubernetescrd
+    annotations: {}
     labels: {}
 
     ## Redirect ingress to an additional defined port on the service
@@ -3558,14 +3232,12 @@ prometheus:
     ##
     # hosts:
     #   - prometheus.domain.com
-    hosts:
-    - prometheus.poshcode.com
+    hosts: []
 
     ## Paths to use for ingress rules - one path should match the prometheusSpec.routePrefix
     ##
-    paths:
-      - /
-    pathType: Prefix
+    paths: []
+    # - /
 
     ## For Kubernetes >= 1.18 you should specify the pathType (determines how Ingress paths should be matched)
     ## See https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#better-path-matching-with-path-types
@@ -3574,10 +3246,10 @@ prometheus:
     ## TLS configuration for Prometheus Ingress
     ## Secret must be manually created in the namespace
     ##
-    tls:
-      - secretName: prometheus-poshcode-com-tls
-        hosts:
-        - prometheus.poshcode.com
+    tls: []
+      # - secretName: prometheus-general-tls
+      #   hosts:
+      #     - prometheus.example.com
 
   ## Configuration for creating an Ingress that will map to each Prometheus replica service
   ## prometheus.servicePerReplica must be enabled
@@ -3691,9 +3363,9 @@ prometheus:
 
     ## Additional Endpoints
     ##
-    additionalEndpoints:
-    - port: oauth-metrics
-      path: /metrics
+    additionalEndpoints: []
+    # - port: oauth-metrics
+    #   path: /metrics
 
   ## Settings affecting prometheusSpec
   ## ref: https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#prometheusspec
@@ -3885,7 +3557,7 @@ prometheus:
     ## prometheus resource to be created with selectors based on values in the helm deployment,
     ## which will also match the PrometheusRule resources created
     ##
-    ruleSelectorNilUsesHelmValues: false
+    ruleSelectorNilUsesHelmValues: true
 
     ## PrometheusRules to be selected for target discovery.
     ## If {}, select all PrometheusRules
@@ -3910,7 +3582,7 @@ prometheus:
     ## prometheus resource to be created with selectors based on values in the helm deployment,
     ## which will also match the servicemonitors created
     ##
-    serviceMonitorSelectorNilUsesHelmValues: false
+    serviceMonitorSelectorNilUsesHelmValues: true
 
     ## ServiceMonitors to be selected for target discovery.
     ## If {}, select all ServiceMonitors
@@ -3933,15 +3605,13 @@ prometheus:
     ## prometheus resource to be created with selectors based on values in the helm deployment,
     ## which will also match the podmonitors created
     ##
-    podMonitorSelectorNilUsesHelmValues: false
+    podMonitorSelectorNilUsesHelmValues: true
 
     ## PodMonitors to be selected for target discovery.
     ## If {}, select all PodMonitors
     ##
     podMonitorSelector: {}
-    #  matchLabels:
-    #    app.kubernetes.io/component: monitoring
-    ### Example which selects PodMonitors with label "prometheus" set to "somelabel"
+    ## Example which selects PodMonitors with label "prometheus" set to "somelabel"
     # podMonitorSelector:
     #   matchLabels:
     #     prometheus: somelabel
@@ -3957,7 +3627,7 @@ prometheus:
     ## prometheus resource to be created with selectors based on values in the helm deployment,
     ## which will also match the probes created
     ##
-    probeSelectorNilUsesHelmValues: false
+    probeSelectorNilUsesHelmValues: true
 
     ## Probes to be selected for target discovery.
     ## If {}, select all Probes
@@ -3979,7 +3649,7 @@ prometheus:
     ## prometheus resource to be created with selectors based on values in the helm deployment,
     ## which will also match the scrapeConfigs created
     ##
-    scrapeConfigSelectorNilUsesHelmValues: false
+    scrapeConfigSelectorNilUsesHelmValues: true
 
     ## scrapeConfigs to be selected for target discovery.
     ## If {}, select all scrapeConfigs
@@ -4139,20 +3809,7 @@ prometheus:
     ## The scrape configuration example below will find master nodes, provided they have the name .*mst.*, relabel the
     ## port to 2379 and allow etcd scraping provided it is running on all Kubernetes master nodes
     ##
-    additionalScrapeConfigs:
-      - job_name: 'kubernetes-endpoints'
-        scrape_interval: 30s
-        kubernetes_sd_configs:
-          - role: endpoints
-        relabel_configs:
-          - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_scrape]
-            action: keep
-            regex: true
-          - source_labels: [__address__, __meta_kubernetes_service_annotation_prometheus_io_port]
-            action: replace
-            target_label: __address__
-            regex: (.+)(?::\d+);(\d+)
-            replacement: $1:$2
+    additionalScrapeConfigs: []
     # - job_name: kube-etcd
     #   kubernetes_sd_configs:
     #     - role: node
@@ -4301,40 +3958,23 @@ prometheus:
 
     ## Containers allows injecting additional containers. This is meant to allow adding an authentication proxy to a Prometheus pod.
     ## if using proxy extraContainer update targetPort with proxy container port
-    containers:
-    - name: oauth-proxy
-      image: quay.io/oauth2-proxy/oauth2-proxy:v7.6.0
-      args:
-      - --upstream=http://127.0.0.1:9090
-      - --http-address=0.0.0.0:8081
-      - --metrics-address=0.0.0.0:8082
-      - --provider=oidc
-      - --oidc-issuer-url=https://dex.poshcode.com
-      - --redirect-url=https://prometheus.poshcode.com/oauth2/callback
-      - --code-challenge-method=S256
-      - --scope=openid profile email
-      - --email-domain=*
-      env:
-      - name: OAUTH2_PROXY_CLIENT_ID
-        value: oauth2-proxy-kube-prometheus-stack
-      - name: OAUTH2_PROXY_CLIENT_SECRET
-        valueFrom:
-          secretKeyRef:
-            name: kube-prometheus-stack-prometheus-oauth2-proxy
-            key: client-secret
-      - name: OAUTH2_PROXY_COOKIE_SECRET
-        valueFrom:
-          secretKeyRef:
-            name: kube-prometheus-stack-prometheus-oauth2-proxy
-            key: cookie-secret
-      ports:
-      - containerPort: 8081
-        name: oauth-proxy
-        protocol: TCP
-      - containerPort: 8082
-        name: oauth-metrics
-        protocol: TCP
-      resources: {}
+    containers: []
+    # containers:
+    # - name: oauth-proxy
+    #   image: quay.io/oauth2-proxy/oauth2-proxy:v7.5.1
+    #   args:
+    #   - --upstream=http://127.0.0.1:9090
+    #   - --http-address=0.0.0.0:8081
+    #   - --metrics-address=0.0.0.0:8082
+    #   - ...
+    #   ports:
+    #   - containerPort: 8081
+    #     name: oauth-proxy
+    #     protocol: TCP
+    #   - containerPort: 8082
+    #     name: oauth-metrics
+    #     protocol: TCP
+    #   resources: {}
 
     ## InitContainers allows injecting additional initContainers. This is meant to allow doing some changes
     ## (permissions, dir tree) on mounted volumes before starting prometheus
@@ -4640,8 +4280,6 @@ thanosRuler:
 
   ## Configure pod disruption budgets for ThanosRuler
   ## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/#specifying-a-poddisruptionbudget
-  ## This configuration is immutable once created and will require the PDB to be deleted to be changed
-  ## https://github.com/kubernetes/kubernetes/issues/45398
   ##
   podDisruptionBudget:
     enabled: false
@@ -4790,9 +4428,9 @@ thanosRuler:
 
     ## Additional Endpoints
     ##
-    additionalEndpoints:
-    - port: oauth-metrics
-      path: /metrics
+    additionalEndpoints: []
+    # - port: oauth-metrics
+    #   path: /metrics
 
   ## Settings affecting thanosRulerpec
   ## ref: https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#thanosrulerspec
@@ -4821,7 +4459,7 @@ thanosRuler:
     ## prometheus resource to be created with selectors based on values in the helm deployment,
     ## which will also match the PrometheusRule resources created
     ##
-    ruleSelectorNilUsesHelmValues: false
+    ruleSelectorNilUsesHelmValues: true
 
     ## PrometheusRules to be selected for target discovery.
     ## If {}, select all PrometheusRules

@@ -1,5 +1,5 @@
 param(
-    $Version = "0.73.0"
+    $Version = "0.75.0"
 )
 Push-Location $PSScriptRoot
 

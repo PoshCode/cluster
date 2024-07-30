@@ -6,7 +6,7 @@ spec:
   targetNamespace: monitoring
   chart:
     spec:
-      version: "58.0.x"
+      version: "61.3.x"
   valuesFrom:
   - kind: ConfigMap
     name: prometheus-values
