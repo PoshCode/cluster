@@ -1,0 +1,21 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: loki
+  namespace: flux-system
+spec:
+  interval: 5m
+  targetNamespace: monitoring
+  releaseName: loki
+  dependsOn:
+    - name: kube-prometheus-stack
+  chart:
+    spec:
+      version: "6.x"
+      chart: loki
+      sourceRef:
+        kind: HelmRepository
+        name: grafana
+        namespace: flux-system
+      interval: 60m
+

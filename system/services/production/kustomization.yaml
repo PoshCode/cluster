@@ -6,6 +6,7 @@ resources:
   - ../bases/dex
   - ../bases/kube-prometheus-stack
   - ../bases/networking
+  - ../bases/loki
 patches:
   - path: cert-manager-release.yaml
     target:
@@ -19,6 +20,10 @@ patches:
     target:
       kind: HelmRelease
       name: kube-prometheus-stack
+  - path: loki-release.yaml
+    target:
+      kind: HelmRelease
+      name: loki
   - path: networking-gateway.yaml
     target:
       kind: Gateway
