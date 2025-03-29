@@ -24,6 +24,12 @@ In general, each application or service has a helm chart, so the base configurat
 
 For each kubernetes cluster, there's then an overlay folder like `apps/production` that specifies the version of the chart and the value overrides to use.
 
+## Troubleshooting & Upgrading
+
+This is purely a demo environment. In almost every case where I've had an upgrade problem (e.g. an issue with loki's chart) I have resolved it by deleting the Flux Kustomization (using the command-line), and allowing flux reconciliation to reinstall it.
+
+One specific instance where that did not work was during the upgrade to release 1.2 of the GRPCRoute CRD (and the corresponding upgrade to 1.17 of Cilium Gateway). Because of the way Kubernetes persists CRDs, once the Cilium Gateway had been upgraded, I had to manually remove the pre-release "v1alpha2" reference from stored versions of the GRPCRoute CRD. See the [notes here](https://gateway-api.sigs.k8s.io/guides/#v12-upgrade-noteshttps://gateway-api.sigs.k8s.io/guides/#v12-upgrade-notes)
+
 ## See Also...
 
 A lot of what you'll see here is based on these two Flux examples, which are both simpler and more documented than this repository.
