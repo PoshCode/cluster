@@ -1,18 +1,18 @@
 resources:
-  - cert-manager-v1.14.3.crds.yaml
-  - gateway-networking-v1.0.0-gatewayclasses.yaml
-  - gateway-networking-v1.0.0-gateways.yaml
-  - gateway-networking-v1.0.0-httproutes.yaml
-  - gateway-networking-v1.0.0-referencegrants.yaml
-  - gateway-networking-v1.0.0-grpcroutes.yaml
-  - gateway-networking-v1.0.0-tlsroutes.yaml
-  - monitoring.coreos.com_0.75.0_alertmanagerconfigs.yaml
-  - monitoring.coreos.com_0.75.0_alertmanagers.yaml
-  - monitoring.coreos.com_0.75.0_podmonitors.yaml
-  - monitoring.coreos.com_0.75.0_probes.yaml
-  - monitoring.coreos.com_0.75.0_prometheusagents.yaml
-  - monitoring.coreos.com_0.75.0_prometheuses.yaml
-  - monitoring.coreos.com_0.75.0_prometheusrules.yaml
-  - monitoring.coreos.com_0.75.0_scrapeconfigs.yaml
-  - monitoring.coreos.com_0.75.0_servicemonitors.yaml
-  - monitoring.coreos.com_0.75.0_thanosrulers.yaml
+- cert-manager-v1.14.3.crds.yaml
+- gateway-networking-v1.2.0-gatewayclasses.yaml
+- gateway-networking-v1.2.0-gateways.yaml
+- gateway-networking-v1.2.0-httproutes.yaml
+- gateway-networking-v1.2.0-referencegrants.yaml
+- gateway-networking-v1.2.0-grpcroutes.yaml
+- gateway-networking-v1.2.0-tlsroutes.yaml
+- monitoring.coreos.com_0.75.0_alertmanagerconfigs.yaml
+- monitoring.coreos.com_0.75.0_alertmanagers.yaml
+- monitoring.coreos.com_0.75.0_podmonitors.yaml
+- monitoring.coreos.com_0.75.0_probes.yaml
+- monitoring.coreos.com_0.75.0_prometheusagents.yaml
+- monitoring.coreos.com_0.75.0_prometheuses.yaml
+- monitoring.coreos.com_0.75.0_prometheusrules.yaml
+- monitoring.coreos.com_0.75.0_scrapeconfigs.yaml
+- monitoring.coreos.com_0.75.0_servicemonitors.yaml
+- monitoring.coreos.com_0.75.0_thanosrulers.yaml
