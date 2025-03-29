@@ -1,0 +1,15 @@
+namespace: open-telemetry
+
+resources:
+- namespace.yaml
+- repository.yaml
+- release.yaml
+# - http-route.yaml
+
+configMapGenerator:
+- name: open-telemetry-demo-values
+  files:
+  - values.yaml=open-telemetry-demo-0.36.1-values.yaml
+
+configurations:
+- valuesfrom.yaml
