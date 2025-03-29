@@ -11,8 +11,13 @@ spec:
   - backendRefs:
     - name: podinfo
       port: 9898
+    filters:
+    - type: URLRewrite
+      urlRewrite:
+        path:
+          type: ReplacePrefixMatch
+          replacePrefixMatch: /
     matches:
     - path:
         type: PathPrefix
-        value: /
-
+        value: /podinfo
