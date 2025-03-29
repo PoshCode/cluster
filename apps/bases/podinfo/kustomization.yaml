@@ -1,22 +1,15 @@
 namespace: podinfo
 
 resources:
-  - namespace.yaml
-  - repository.yaml
-  - release.yaml
-  - http-route.yaml
-
-#  - deployment.yaml
-#  - service.yaml
-# # - ingress.yaml
-#  - routes.yaml
-#  - hpa.yaml
-
+- namespace.yaml
+- repository.yaml
+- release.yaml
+- http-route.yaml
 
 configMapGenerator:
-  - name: podinfo-values
-    files:
-      - values.yaml=podinfo-6.6.1-values.yaml
+- name: podinfo-values
+  files:
+  - values.yaml=podinfo-6.6.1-values.yaml
 
 configurations:
-  - valuesfrom.yaml
+- valuesfrom.yaml
