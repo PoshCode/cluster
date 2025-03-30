@@ -32,6 +32,18 @@ spec:
       certificateRefs:
       - kind: Secret
         name: tld-tls
+  - name: otel-demo
+    allowedRoutes:
+      namespaces:
+        from: All
+    protocol: HTTPS
+    port: 443
+    hostname: otel-demo.poshcode.com
+    tls:
+      mode: Terminate
+      certificateRefs:
+      - kind: Secret
+        name: otel-demo-tls
   - name: https-dex
     allowedRoutes:
       namespaces:

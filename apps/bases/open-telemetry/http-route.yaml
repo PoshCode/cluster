@@ -6,10 +6,10 @@ spec:
   parentRefs:
   - namespace: networking
     name: damascus
-    sectionName: https-tld
+    sectionName: otel-demo
   rules:
   - backendRefs:
-    - name: open-telemetry-demo-frontend-proxy
+    - name: frontend-proxy
       port: 8080
     matches:
     - path:
