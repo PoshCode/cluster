@@ -860,7 +860,7 @@ prometheus:
     service:
       servicePort: 9090
     resources:
-      requests:
+      limits:
         memory: 750Mi
 
 grafana:
