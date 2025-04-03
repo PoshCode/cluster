@@ -30,8 +30,7 @@ spec:
     tls:
       mode: Terminate
       certificateRefs:
-      - kind: Secret
-        name: tld-tls
+      - name: tld-tls
   - name: otel-demo
     allowedRoutes:
       namespaces:
@@ -42,8 +41,7 @@ spec:
     tls:
       mode: Terminate
       certificateRefs:
-      - kind: Secret
-        name: otel-demo-tls
+      - name: otel-demo-tls
   - name: https-dex
     allowedRoutes:
       namespaces:
@@ -54,8 +52,7 @@ spec:
     tls:
       mode: Terminate
       certificateRefs:
-      - kind: Secret
-        name: dex-tls
+      - name: dex-tls
   - name: https-grafana
     allowedRoutes:
       namespaces:
@@ -66,8 +63,7 @@ spec:
     tls:
       mode: Terminate
       certificateRefs:
-      - kind: Secret
-        name: grafana-tls
+      - name: grafana-tls
   - name: https-prometheus
     allowedRoutes:
       namespaces:
@@ -78,8 +74,7 @@ spec:
     tls:
       mode: Terminate
       certificateRefs:
-      - kind: Secret
-        name: prometheus-tls
+      - name: prometheus-tls
   - name: https-alerts
     allowedRoutes:
       namespaces:
@@ -90,5 +85,4 @@ spec:
     tls:
       mode: Terminate
       certificateRefs:
-      - kind: Secret
-        name: alerts-tls
+      - name: alerts-tls
