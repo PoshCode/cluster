@@ -6,7 +6,7 @@ metadata:
 spec:
   chart:
     spec:
-      version: "1.16.x"
+      version: "1.17.x"
   values:
     prometheus:
       enabled: true
@@ -14,4 +14,4 @@ spec:
         enabled: true
 
     extraArgs:
-    - --feature-gates=ExperimentalGatewayAPISupport=true
+    - --enable-gateway-api
