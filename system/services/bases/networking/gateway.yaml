@@ -35,11 +35,7 @@ spec:
   - name: otel-demo
     allowedRoutes:
       namespaces:
-        from: Selector
-        selector:
-          matchExpressions:
-          - key: kubernetes.io/metadata.name
-            operator: open-telemetry
+        from: All
     protocol: HTTPS
     port: 443
     hostname: otel-demo # full hostname override in layers
