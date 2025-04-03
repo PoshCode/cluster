@@ -26,7 +26,7 @@ spec:
         from: All
     protocol: HTTPS
     port: 443
-    hostname: poshcode.com
+    # hostname: # hostname override in layers
     tls:
       mode: Terminate
       certificateRefs:
@@ -42,7 +42,7 @@ spec:
             operator: open-telemetry
     protocol: HTTPS
     port: 443
-    hostname: otel-demo.poshcode.com
+    hostname: otel-demo # full hostname override in layers
     tls:
       mode: Terminate
       certificateRefs:
@@ -54,7 +54,7 @@ spec:
         from: All
     protocol: HTTPS
     port: 443
-    hostname: dex.poshcode.com
+    hostname: dex # full hostname override in layer
     tls:
       mode: Terminate
       certificateRefs:
@@ -66,7 +66,7 @@ spec:
         from: All
     protocol: HTTPS
     port: 443
-    hostname: grafana.poshcode.com
+    hostname: grafana # full hostname override in laye
     tls:
       mode: Terminate
       certificateRefs:
@@ -78,7 +78,7 @@ spec:
         from: All
     protocol: HTTPS
     port: 443
-    hostname: prometheus.poshcode.com
+    hostname: prometheus # full hostname override in laye
     tls:
       mode: Terminate
       certificateRefs:
@@ -90,7 +90,7 @@ spec:
         from: All
     protocol: HTTPS
     port: 443
-    hostname: alerts.poshcode.com
+    hostname: alerts # full hostname override in laye
     tls:
       mode: Terminate
       certificateRefs:
