@@ -35,7 +35,11 @@ spec:
   - name: otel-demo
     allowedRoutes:
       namespaces:
-        from: All
+        from: Selector
+        selector:
+          matchExpressions:
+          - key: kubernetes.io/metadata.name
+            operator: open-telemetry
     protocol: HTTPS
     port: 443
     hostname: otel-demo.poshcode.com
