@@ -8,10 +8,10 @@ spec:
     spec:
       version: "1.17.x"
   values:
+    config:
+      enableGatewayAPI: true
+
     prometheus:
       enabled: true
       servicemonitor:
         enabled: true
-
-    extraArgs:
-    - --enable-gateway-api
