@@ -10,11 +10,10 @@ spec:
   infrastructure:
     annotations:
       service.beta.kubernetes.io/azure-dns-label-name: poshcode
-  # addresses:
-  #   - type: Hostname
-  #     value: poshcode
   listeners:
-  - name: http-1 # this listener has to stay around (without a hostname) for cert-manager HTTP01 challenges
+  # We always need to keep an HTTP listener on port 80 for HTTP-01 challenges to work with cert-manager.
+  # it has to allow all namespaces and not specify a hostname
+  - name: http-01-solver
     protocol: HTTP
     port: 80
     allowedRoutes:

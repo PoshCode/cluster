@@ -15,12 +15,12 @@ spec:
     # Enable the HTTP-01 challenge provider
     solvers:
     #- dns01:
-        # Add azureDNS resolver for Private endpoints, but this need to be fixed: https://github.com/cert-manager/website/issues/662
-        #azureDNS:
-        #  clientID: $(az aks show -g az-k8s-e0hm-rg -n aks-az-k8s-e0hm --query identityProfile.kubeletidentity.clientId -o tsv)
-        #  subscriptionID: 2d5bb2c8-8be8-4539-b48f-fbfd86852fa9
-        #  resourceGroupName: domainssl
-        #  hostedZoneName: azdemo.co.uk
+    # Add azureDNS resolver for Private endpoints, but this need to be fixed: https://github.com/cert-manager/website/issues/662
+    #azureDNS:
+    #  clientID: $(az aks show -g az-k8s-e0hm-rg -n aks-az-k8s-e0hm --query identityProfile.kubeletidentity.clientId -o tsv)
+    #  subscriptionID: 2d5bb2c8-8be8-4539-b48f-fbfd86852fa9
+    #  resourceGroupName: domainssl
+    #  hostedZoneName: azdemo.co.uk
     # - http01:
     #     ingress:
     #       class: traefik
@@ -30,3 +30,4 @@ spec:
           - name: damascus
             namespace: networking
             kind: Gateway
+            sectionName: http-01-solver
