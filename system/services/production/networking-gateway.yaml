@@ -3,7 +3,7 @@
   value: poshcode.com
 - op: replace
   path: /spec/listeners/2/hostname
-  value: otel-demo.poshcode.com
+  value: otel.poshcode.com
 - op: replace
   path: /spec/listeners/3/hostname
   value: dex.poshcode.com

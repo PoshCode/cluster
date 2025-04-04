@@ -26,22 +26,22 @@ spec:
         from: All
     protocol: HTTPS
     port: 443
-    # hostname: # hostname override in layers
+    hostname: poshcode.com # hostname override in layers
     tls:
       mode: Terminate
       certificateRefs:
       - name: tld-tls
-  - name: otel-demo
+  - name: https-otel
     allowedRoutes:
       namespaces:
         from: All
     protocol: HTTPS
     port: 443
-    hostname: otel-demo # full hostname override in layers
+    hostname: otel # full hostname override in layers
     tls:
       mode: Terminate
       certificateRefs:
-      - name: otel-demo-tls
+      - name: otel-tls
   - name: https-dex
     allowedRoutes:
       namespaces:
@@ -81,7 +81,7 @@ spec:
         from: All
     protocol: HTTPS
     port: 443
-    hostname: alerts # full hostname override in laye
+    hostname: alerts.poshcode.com # full hostname override in laye
     tls:
       mode: Terminate
       certificateRefs:

@@ -6,7 +6,7 @@ spec:
   parentRefs:
   - namespace: networking
     name: damascus
-    sectionName: otel-demo
+    sectionName: https-otel
   rules:
   - backendRefs:
     - name: frontend-proxy
