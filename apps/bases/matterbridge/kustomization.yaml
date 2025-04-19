@@ -1,0 +1,10 @@
+namespace: matterbridge
+
+resources:
+- namespace.yaml
+- deployment.yaml
+
+configMapGenerator:
+- name: matterbridge
+  files:
+  - matterbridge.yaml=matterbridge.ini
