@@ -1,0 +1,6 @@
+namespace: matterbridge
+
+resources:
+- namespace.yaml
+- deployment.yaml
+- config.yaml

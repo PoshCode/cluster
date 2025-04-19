@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: matterbridge
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      k8s-app: matterbridge
+  strategy:
+    rollingUpdate:
+      maxSurge: 100%
+      maxUnavailable: 0%
+    type: RollingUpdate
+  template:
+    metadata:
+      name: matterbridge
+      labels:
+        k8s-app: matterbridge
+    spec:
+      restartPolicy: Always
+      containers:
+      - name: matterbridge
+        image: 42wim/matterbridge:1.26
+        command: [ "/bin/matterbridge", "-conf", "/config/matterbridge.toml" ]
+        resources:
+          requests:
+            memory: 64Mi
+            cpu: 32m
+          limits:
+            memory: 64Mi
+            cpu: 32m
+        volumeMounts:
+        - name: config
+          mountPath: /config
+          readOnly: true
+      volumes:
+      - name: config
+        secret:
+          secretName: matterbridge.toml
