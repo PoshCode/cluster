@@ -6,3 +6,9 @@ resources:
 
 patches:
 - path: podinfo-release.yaml
+
+secretGenerator:
+- name: matterbridge-config
+  namespace: matterbridge
+  files:
+  - matterbridge.yaml=matterbridge-config.yaml

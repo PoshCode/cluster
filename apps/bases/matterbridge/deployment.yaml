@@ -22,8 +22,8 @@ spec:
       restartPolicy: Always
       containers:
       - name: matterbridge
-        image: 42wim/matterbridge:1.26
-        command: [ "/bin/matterbridge", "-conf", "/config/matterbridge.toml" ]
+        image: ghcr.io/poshcode/matterbridge:1.28.2
+        command: [ "/bin/matterbridge", "-conf", "/config/matterbridge.yaml" ]
         resources:
           requests:
             memory: 64Mi
@@ -38,4 +38,7 @@ spec:
       volumes:
       - name: config
         secret:
-          secretName: matterbridge.toml
+          secretName: matterbridge-config
+          items:
+          - key: matterbridge.yaml
+            path: matterbridge.yaml

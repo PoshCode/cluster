@@ -1,0 +1,468 @@
+general:
+    RemoteNickFormat: '{NICK} ({LABEL}) '
+    EditSuffix: ' (edited)'
+    IconURL: https://robohash.org/{NICK}.png?set=set4
+    ReplaceMessages:
+        - - '@everyone'
+          - ~everyone
+        - - '@here'
+          - ~here
+discord:
+    powershell:
+        Label: discord
+        Server: PowerShell
+        Token: ENC[AES256_GCM,data:ysrVS6iWaT0lAlYwTuvkwyV23iahe+I1NMrU1yNAae/yRj7e7ItzRxRqHbBK8Ays2bfZqkNFV4LfU10=,iv:0nDyfuRR4NwNIXUsse+g+FdStf/dW6xGKZy0eLZNcUU=,tag:z9ssG/9Minn6olLLLd4XOw==,type:str]
+        AutoWebhooks: true
+        IgnoreNicks: GitHub
+        SyncTopic: true
+        EditSuffix: ' (edited)'
+    poshgui:
+        Label: poshgui
+        Token: ENC[AES256_GCM,data:0RJhbs+38kghMpaVtENbFvBZ+Rx2bSbuIZaMnA+MFomLrOjpujX9vWqzXFuPAOGygMMyB023RKq+hS8=,iv:MCp10p0u5EnLFJq8fUNn36lRI6O8HaZEkTTYnDH7r1U=,tag:TGKqRH1VykpooURUqxC1/w==,type:str]
+        Server: POSHGUI
+        AutoWebhooks: true
+        SyncTopic: true
+        EditSuffix: ' (edited)'
+irc:
+    libera:
+        Label: irc
+        Server: irc.libera.chat:7000
+        UseTLS: true
+        Nick: pwsh
+        UseSASL: true
+        NickServNick: pwsh
+        NickServPassword: ENC[AES256_GCM,data:8wX1ez2/sZ9F64U63lEH30SfF/A=,iv:RZzHmtOLJpG8VIC0lNkT4rTyJu3prztA3PiHLwBvkwQ=,tag:QDHUOZ2oEMvpcGC73gt5ig==,type:str]
+        ColorNicks: true
+        RemoteNickFormat: '({PROTOCOL}) <{NOPINGNICK}> '
+        EditDisable: true
+        StripMarkdown: true
+slack:
+    powershell:
+        Label: ps
+        Token: ENC[AES256_GCM,data:QfLUaX563KdHRibT43Z0zyzA+w4tIm9S/lxwcGIQ8lpuzUKR5RJ27lWxGI/oFx9UrB8omUzj,iv:nOoo1Lah090iCw5yIPYKFTQNVetvmb5PFPCQJgzRXlg=,tag:WhMGC1p0S3cNxhfPIpDsyQ==,type:str]
+        AppToken: ENC[AES256_GCM,data:4LKp72Z2CWURY/YDSL8bE7X7XbFjoR0zMypp0EM+XOXHHgT7Y0mNgL9PkVy2zeS8CmguIx5TdxWMEloFDsjs2ajyx8p8Ept7woQuNO36uNbDwcwHBZI0JiedC3ZanKqwsw==,iv:JgC0YXYQR4A+F/ubVNjYpMe1uqnXjXNOcbA16YGxn0s=,tag:s4yk3tviiGVHiDMmMZTUhg==,type:str]
+        IgnoreNicks: github
+        EditSuffix: ' (edited)'
+gateway:
+    - name: admins
+      enable: true
+      inout:
+        - account: slack.powershell
+          channel: admins
+        - account: discord.powershell
+          channel: admins
+    - name: moderators
+      enable: true
+      inout:
+        - account: slack.powershell
+          channel: moderators
+        - account: discord.powershell
+          channel: moderators
+    - name: announcements
+      enable: true
+      inout:
+        - account: slack.powershell
+          channel: announcements
+        - account: discord.powershell
+          channel: announcements
+    - name: poshcode
+      enable: true
+      inout:
+        - account: slack.powershell
+          channel: poshcode
+        - account: discord.powershell
+          channel: poshcode
+    - name: bridge
+      enable: true
+      inout:
+        - account: slack.powershell
+          channel: bridge
+        - account: irc.libera
+          channel: '#PowerShell'
+        - account: discord.powershell
+          channel: bridge
+    - name: battlestations
+      enable: true
+      inout:
+        - account: slack.powershell
+          channel: battlestations
+        - account: discord.powershell
+          channel: battlestations
+    - name: devops
+      enable: true
+      inout:
+        - account: slack.powershell
+          channel: devops
+        - account: discord.powershell
+          channel: devops
+    - name: editors
+      enable: true
+      inout:
+        - account: slack.powershell
+          channel: editors
+        - account: discord.powershell
+          channel: editors
+    - name: fringe
+      enable: true
+      inout:
+        - account: slack.powershell
+          channel: fringe
+        - account: discord.powershell
+          channel: fringe
+    - name: career-talk
+      enable: true
+      inout:
+        - account: slack.powershell
+          channel: career-talk
+        - account: discord.powershell
+          channel: career-talk
+    - name: linux
+      enable: true
+      inout:
+        - account: slack.powershell
+          channel: linux
+        - account: discord.powershell
+          channel: linux
+    - name: mvpsonly
+      enable: true
+      inout:
+        - account: slack.powershell
+          channel: mvpsonly
+        - account: discord.powershell
+          channel: mvpsonly
+    - name: news
+      enable: true
+      inout:
+        - account: slack.powershell
+          channel: news
+        - account: discord.powershell
+          channel: newsfeed
+    - name: powershellhelp
+      enable: true
+      inout:
+        - account: slack.powershell
+          channel: powershell-help
+        - account: discord.powershell
+          channel: powershell-help
+    - name: powershellcontrib
+      enable: true
+      inout:
+        - account: slack.powershell
+          channel: ps-contributors
+        - account: discord.powershell
+          channel: powershell-contributors
+    - name: random
+      enable: true
+      inout:
+        - account: slack.powershell
+          channel: random
+        - account: discord.powershell
+          channel: random
+    - name: security
+      enable: true
+      inout:
+        - account: slack.powershell
+          channel: security
+        - account: discord.powershell
+          channel: security
+    - name: terminal
+      enable: true
+      inout:
+        - account: slack.powershell
+          channel: terminal
+        - account: discord.powershell
+          channel: terminal
+    - name: testing
+      enable: true
+      inout:
+        - account: slack.powershell
+          channel: testing
+        - account: discord.powershell
+          channel: testing
+    - name: organizers
+      enable: true
+      inout:
+        - account: slack.powershell
+          channel: user-group-organizers
+        - account: discord.powershell
+          channel: user-group-organizers
+    - name: speakingopportunity
+      enable: true
+      inout:
+        - account: slack.powershell
+          channel: speaking-opportunity
+        - account: discord.powershell
+          channel: speaking-opportunity
+    - name: conferences
+      enable: true
+      inout:
+        - account: slack.powershell
+          channel: conferences
+        - account: discord.powershell
+          channel: conferences
+    - name: psconf-asia
+      enable: true
+      inout:
+        - account: slack.powershell
+          channel: psconf-asia
+        - account: discord.powershell
+          channel: psconf-asia
+    - name: psconfeu
+      enable: true
+      inout:
+        - account: slack.powershell
+          channel: psconfeu
+        - account: discord.powershell
+          channel: psconfeu
+    - name: dutch
+      enable: true
+      inout:
+        - account: slack.powershell
+          channel: dutch
+        - account: discord.powershell
+          channel: dutch
+    - name: gainesville
+      enable: true
+      inout:
+        - account: slack.powershell
+          channel: gainesville
+        - account: discord.powershell
+          channel: gainesville
+    - name: social-events
+      enable: true
+      inout:
+        - account: slack.powershell
+          channel: social-events
+        - account: discord.powershell
+          channel: social-events
+    - name: streaming
+      enable: true
+      inout:
+        - account: slack.powershell
+          channel: streaming
+        - account: discord.powershell
+          channel: streaming
+    - name: raleigh
+      enable: true
+      inout:
+        - account: slack.powershell
+          channel: raleigh
+        - account: discord.powershell
+          channel: raleigh
+    - name: uk
+      enable: true
+      inout:
+        - account: slack.powershell
+          channel: psuguk
+        - account: discord.powershell
+          channel: uk
+    - name: french
+      enable: true
+      inout:
+        - account: slack.powershell
+          channel: french
+        - account: discord.powershell
+          channel: french
+    - name: german
+      enable: true
+      inout:
+        - account: slack.powershell
+          channel: german
+        - account: discord.powershell
+          channel: german
+    - name: aws
+      enable: true
+      inout:
+        - account: slack.powershell
+          channel: aws
+        - account: discord.powershell
+          channel: aws
+    - name: azure
+      enable: true
+      inout:
+        - account: slack.powershell
+          channel: azure
+        - account: discord.powershell
+          channel: azure
+    - name: azurefunctions
+      enable: true
+      inout:
+        - account: slack.powershell
+          channel: azure-functions
+        - account: discord.powershell
+          channel: azure-functions
+    - name: chatops
+      enable: true
+      inout:
+        - account: slack.powershell
+          channel: chatops
+        - account: discord.powershell
+          channel: chatops
+    - name: dbatools
+      enable: true
+      inout:
+        - account: slack.powershell
+          channel: dbatools
+        - account: discord.powershell
+          channel: dbatools
+    - name: dsc
+      enable: true
+      inout:
+        - account: slack.powershell
+          channel: dsc
+        - account: discord.powershell
+          channel: dsc
+    - name: exchange
+      enable: true
+      inout:
+        - account: slack.powershell
+          channel: exchange
+        - account: discord.powershell
+          channel: exchange
+    - name: git
+      enable: true
+      inout:
+        - account: slack.powershell
+          channel: git
+        - account: discord.powershell
+          channel: git
+    - name: importexcel
+      enable: true
+      inout:
+        - account: slack.powershell
+          channel: importexcel
+        - account: discord.powershell
+          channel: importexcel
+    - name: jupyter
+      enable: true
+      inout:
+        - account: slack.powershell
+          channel: jupyter
+        - account: discord.powershell
+          channel: jupyter
+    - name: ai
+      enable: true
+      inout:
+        - account: slack.powershell
+          channel: ai
+        - account: discord.powershell
+          channel: ai
+    - name: netapp
+      enable: true
+      inout:
+        - account: slack.powershell
+          channel: dataontap
+        - account: discord.powershell
+          channel: netapp
+    - name: packaging
+      enable: true
+      inout:
+        - account: slack.powershell
+          channel: packaging
+        - account: discord.powershell
+          channel: packaging
+    - name: pode
+      enable: true
+      inout:
+        - account: slack.powershell
+          channel: pode
+        - account: discord.powershell
+          channel: pode
+    - name: poshgui
+      enable: true
+      inout:
+        - account: slack.powershell
+          channel: poshgui
+        - account: discord.powershell
+          channel: poshgui
+        - account: discord.poshgui
+          channel: general
+    - name: psframework
+      enable: true
+      inout:
+        - account: slack.powershell
+          channel: psframework
+        - account: discord.powershell
+          channel: psframework
+    - name: psgsuite
+      enable: true
+      inout:
+        - account: slack.powershell
+          channel: psgsuite
+        - account: discord.powershell
+          channel: psgsuite
+    - name: pskoans
+      enable: true
+      inout:
+        - account: slack.powershell
+          channel: pskoans
+        - account: discord.powershell
+          channel: pskoans
+    - name: ScriptAnalyzer
+      enable: true
+      inout:
+        - account: slack.powershell
+          channel: scriptanalyzer
+        - account: discord.powershell
+          channel: scriptanalyzer
+    - name: sharepoint
+      enable: true
+      inout:
+        - account: slack.powershell
+          channel: sharepoint
+        - account: discord.powershell
+          channel: sharepoint
+    - name: sqlserver
+      enable: true
+      inout:
+        - account: slack.powershell
+          channel: sqlserver
+        - account: discord.powershell
+          channel: sqlserver
+    - name: universal
+      enable: true
+      inout:
+        - account: slack.powershell
+          channel: universal
+        - account: discord.powershell
+          channel: universal
+    - name: vscode
+      enable: true
+      inout:
+        - account: slack.powershell
+          channel: vscode
+        - account: discord.powershell
+          channel: vscode
+    - name: vscodecontributors
+      enable: true
+      inout:
+        - account: slack.powershell
+          channel: vscode-contributors
+        - account: discord.powershell
+          channel: vscode-contributors
+sops:
+    azure_kv:
+        - vault_url: https://kv-joel.vault.azure.net
+          name: sops-key
+          version: 5ef3f03a360140bbb419a997adb4ea3d
+          created_at: "2025-09-20T23:02:39Z"
+          enc: skvy2Kuo1VShB-zI_ntJjvgexpET68WvCYWM6Q69cmPzlVpX83dBHr2DCX-wEFPGpOR57xw7ZhyXF0wMl54aNl1MbsSxh4joj__pXZv8Uwjy52iw9hyDFoet1l9pmbAEALPmdD-u0MhuYJQyUXk1ILfUyH1u0hcrDwKMIsTAm58CXN_fvboLZOeIYSHDg19bqxoQPZlabNET7f7puJh3A_6CGSC2n2mEZRCyUhEDBU6CBeyWPhpxfZ7zn2UoigJMO1YdjSzhHgKY_aXdBr1Cbj6JaFrAi8Bq9GseBq8DQLs8huL_p9eHOl2Qs_YDC_vS3eFoTlj1kh5ZUV6rctCiOt-8Er8wuDKOLL7THBSqHAn1WZgzSrBVUYXhFSwg4geG_AA6bIEZYYPC1fsM-Ihm5ZVDz_rgZB9iNPUVQaiyNUSEAWztukvvaf4nz55kJorI9gDV7yVHcrCW9GBoROLnVER1bkLzhFh9SGvQv_sODMhQUQujmLwinG52tf8Ng5iCR1444yC_yOaL8sQ2IhgPxrC1MPZOCaJmg8Ewx2fDgPs8ClzAa0rjffNwz1PI3K1-_rRGbc6g6WEoixLQ0hZ432iy8s4VwsvUtTqmPtghiKSOxGFpXs_2MB9W9URLpZswGCYE3DPi_123byM14ueX0U2cjYpM0unWA_Oy_XvtpNc
+        - vault_url: https://kv-poshcode.vault.azure.net
+          name: sops-key
+          version: f49a0e054ffe451a85df33e5cdf7946a
+          created_at: "2025-09-20T23:02:39Z"
+          enc: m2mu4cp4r872fVPrw86s82iaSRiH-FWJY1lQeBFpVtbMdxmFKfhPcoIHXcsXn_utgASl2iChb_5TdNEtrh-MfauIeR70mx5N5EjidzHWxcknLj25v57ZkCtKucjca1OCLKdq6h6Te1xfFNZLEWm29FKuyu_0YtEjwf85GJKph7BGS0YLquK7AaOVKOI3X99WRud4sShZMcLsm3xBLhfLMJ0AxXD2TIOtlQ1PszxAgykiKRusLiwZG-NWUBNobsU2JTEdFKO7Y0i7UYd6Mj9IrqoXcabEPCAgHDaEr7hqvX55cL1MwYySN6cQjjxjF9wKpHaFuYWsakXj7VQGL3A9_g
+    age:
+        - recipient: age12nc5tc37e70nxpjn7rulvn650l6wztftq75audd4nftpue4jp3uqdac6el
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBvWjF4Ung0OUxOa3h1OE1r
+            dHIzeE80ZHFkeG8xcmFFTXI5MjVWVXJTVG04Ck9xZkJHbDVMOVlZemxVM2haVzVa
+            dGFLZ0dsY1YycWk1TEh6dEtmQllML1kKLS0tIHBIOHpWWFRlQzVXMTVVTnQ3cmsr
+            RXlWdnZDTSttTVJXQ1BsZk1TaUpkWU0KgLiVW/cQiIy0DgCYaX1F364a0C44BXfF
+            1bcILfgJRvk4Va8nLoq7nqtldI3qEx1xLIVrJfIndLlHA6lR3bYzkQ==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2025-09-20T23:02:44Z"
+    mac: ENC[AES256_GCM,data:OEpbDoksy9CtaAA99vuj8TZMaNCl9KwnJQvBe57cAhSh+2TiEIZ1b1IxHj+OZELl8i06yOHY2JIsJ5Zacc8JOh92sIdjfFKYNQjvsR7zAc5CjkT0YmmJxFUJhrW0OccY0bnZr/a5QoDjWfF5Exqt+13ghi9M17JThzcysyBVUbw=,iv:XA7XRy6bxe3QWNeTEy6GUFkiO1BP3ojQrN2mxo611fA=,tag:5Agykl/2jv0s+zN8rz64nA==,type:str]
+    encrypted_regex: ^(data|stringData|.*Token|.*Password)$
+    version: 3.10.2
