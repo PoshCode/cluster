@@ -2,7 +2,7 @@
 
 This repo has my gitOps configuration for the PoshCode Kubernetes cluster.
 
-The actual cluster is an AKS cluster deployed with my [Azure Bicep templates](/PoshCode/aks-bicep), which are kept in a separate repository to avoid extra reconciliation.
+The actual cluster is an AKS cluster deployed with my [Azure Bicep templates](https://github.com/PoshCode/aks-bicep), which are kept in a separate repository to avoid extra reconciliation.
 
 ## Flux GitOps with Kustomize
 
